@@ -36,6 +36,7 @@ public class Adresse {
         this.adresse3 = adresse3;
         this.codepostal = codePostal;
         this.ville = ville;
+        this.pays = pays;
     }
 
     public Adresse(
@@ -113,5 +114,15 @@ public class Adresse {
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Adresse{" +
+                "id=" + id +
+                ", adresse2='" + adresse2 + '\'' +
+                ", codepostal='" + codepostal + '\'' +
+                ", ville='" + ville + '\'' +
+                '}';
     }
 }

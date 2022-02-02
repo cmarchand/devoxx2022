@@ -8,15 +8,19 @@ import java.util.Calendar;
 public class Facture {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Client client;
     @Temporal(TemporalType.TIMESTAMP)
     private java.util.Calendar date;
     private BigDecimal totalHT;
     private BigDecimal totalTVA;
     private BigDecimal totalTTC;
+    @Transient
+    private Vistamboire vistamboire;
 
-    public Facture() {}
+    public Facture() {
+        this.vistamboire = new Vistamboire();
+    }
     public Facture(long id, Client client, Calendar date, BigDecimal totalHT, BigDecimal totalTVA, BigDecimal totalTTC) {
         this();
         this.id = id;
@@ -26,9 +30,34 @@ public class Facture {
         this.totalTVA = totalTVA;
         this.totalTTC = totalTTC;
     }
-    public Facture(Client client) {
+    public Facture(Client client, Calendar date) {
         this();
         this.client = client;
+        this.date = date;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public Calendar getDate() {
+        return date;
+    }
+
+    public BigDecimal getTotalHT() {
+        return totalHT;
+    }
+
+    public BigDecimal getTotalTVA() {
+        return totalTVA;
+    }
+
+    public BigDecimal getTotalTTC() {
+        return totalTTC;
     }
 
     @Override
@@ -44,5 +73,23 @@ public class Facture {
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Facture{" +
+                "id=" + id +
+                ", client=" + client +
+                ", date=" + date +
+                ", totalHT=" + totalHT +
+                ", totalTVA=" + totalTVA +
+                ", totalTTC=" + totalTTC +
+                '}';
+    }
+
+    public void calculate(Vistamboire vistamboire) {
+        totalHT = vistamboire.getPrixUnitaireHT();
+        totalTVA = totalHT.multiply(vistamboire.getTauxTVA());
+        totalTTC = totalHT.add(totalTVA);
     }
 }
