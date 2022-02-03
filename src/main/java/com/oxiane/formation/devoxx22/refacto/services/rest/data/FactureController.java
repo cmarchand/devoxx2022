@@ -41,12 +41,13 @@ public class FactureController {
 
     @PostMapping("/")
     public Facture createFacture(
-            @RequestParam Long clientId
+            @RequestParam Long clientId,
+            @RequestParam(required = false, defaultValue = "1") int qte
         ) {
         Client client = clientRepository
                 .findById(clientId)
                 .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client inconnu: "+clientId));
-        Facture facture = new Facture(client, new GregorianCalendar());
+        Facture facture = new Facture(client, new GregorianCalendar(), qte);
         Vistamboire vistamboire = vistamboireRepository.findByValidAtDate(facture.getDate());
         facture.calculate(vistamboire);
         return repository.save(facture);

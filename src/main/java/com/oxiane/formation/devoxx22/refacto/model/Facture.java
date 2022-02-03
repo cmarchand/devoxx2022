@@ -15,6 +15,7 @@ public class Facture {
     private BigDecimal totalHT;
     private BigDecimal totalTVA;
     private BigDecimal totalTTC;
+    private int qte;
 
     public Facture() {
     }
@@ -27,10 +28,14 @@ public class Facture {
         this.totalTVA = totalTVA;
         this.totalTTC = totalTTC;
     }
-    public Facture(Client client, Calendar date) {
+    public Facture(Client client, Calendar date, int qte) {
         this();
         this.client = client;
         this.date = date;
+        this.qte = qte;
+    }
+    public Facture(Client client, Calendar date) {
+        this(client, date, 1);
     }
 
     public Long getId() {
@@ -56,6 +61,8 @@ public class Facture {
     public BigDecimal getTotalTTC() {
         return totalTTC;
     }
+
+    public int getQte() { return qte; }
 
     @Override
     public boolean equals(Object o) {
@@ -85,7 +92,7 @@ public class Facture {
     }
 
     public void calculate(Vistamboire vistamboire) {
-        totalHT = vistamboire.getPrixUnitaireHT();
+        totalHT = vistamboire.getPrixUnitaireHT().multiply(BigDecimal.valueOf((long)qte));
         totalTVA = totalHT.multiply(vistamboire.getTauxTVA());
         totalTTC = totalHT.add(totalTVA);
     }

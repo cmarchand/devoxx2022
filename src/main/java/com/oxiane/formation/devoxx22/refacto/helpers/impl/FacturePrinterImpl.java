@@ -22,7 +22,7 @@ public class FacturePrinterImpl implements FacturePrinter {
             ____________________________________________________________________
             | Article                    | Prix Unitaire | Quantité | Taux TVA |
             |----------------------------|---------------|----------|----------|
-            | Vistamboire coins nickelés | %9$13.2f |        1 | %10$8.2f |
+            | Vistamboire coins nickelés | %9$13.2f | %14$8d | %10$8.2f |
             ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
                                                 Montant Hors Taxe : %11$10.2f €
                                                 Montant Total TVA : %12$10.2f €
@@ -45,6 +45,7 @@ public class FacturePrinterImpl implements FacturePrinter {
                 vistamboire.getTauxTVA(),
                 facture.getTotalHT(),
                 facture.getTotalTVA(),
-                facture.getTotalTTC());
+                facture.getTotalTTC(),
+                facture.getQte());
     }
 }
