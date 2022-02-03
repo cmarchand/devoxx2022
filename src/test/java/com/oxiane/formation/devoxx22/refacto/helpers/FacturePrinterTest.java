@@ -24,7 +24,12 @@ public class FacturePrinterTest {
         Adresse adresse = new Adresse(1L, null, "98 avenue du Général Leclerc", null, "92100", "Boulogne Billancourt", "France");
         Client client = new Client(1L,"Chombier", "Michel", adresse);
         Facture facture = new Facture(client, FIXED_DATE);
-        Vistamboire vistamboire = new Vistamboire(BigDecimal.TEN, new BigDecimal(0.2d), LOWER_BOUND, UPPER_BOUND);
+        Vistamboire vistamboire = new Vistamboire(
+                BigDecimal.TEN,
+                new BigDecimal(0.2d),
+                new BigDecimal(1),
+                LOWER_BOUND,
+                UPPER_BOUND);
         facture.calculate(vistamboire);
         FacturePrinterImpl printer = new FacturePrinterImpl();
         String expected = """

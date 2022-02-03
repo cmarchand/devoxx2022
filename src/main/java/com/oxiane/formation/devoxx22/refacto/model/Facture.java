@@ -15,11 +15,8 @@ public class Facture {
     private BigDecimal totalHT;
     private BigDecimal totalTVA;
     private BigDecimal totalTTC;
-    @Transient
-    private Vistamboire vistamboire;
 
     public Facture() {
-        this.vistamboire = new Vistamboire();
     }
     public Facture(long id, Client client, Calendar date, BigDecimal totalHT, BigDecimal totalTVA, BigDecimal totalTTC) {
         this();
