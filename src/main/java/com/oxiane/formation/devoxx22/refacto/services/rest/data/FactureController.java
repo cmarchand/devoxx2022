@@ -1,5 +1,6 @@
 package com.oxiane.formation.devoxx22.refacto.services.rest.data;
 
+import com.oxiane.formation.devoxx22.refacto.helpers.FacturePrinter;
 import com.oxiane.formation.devoxx22.refacto.model.Client;
 import com.oxiane.formation.devoxx22.refacto.model.Facture;
 import com.oxiane.formation.devoxx22.refacto.model.Vistamboire;
@@ -9,15 +10,12 @@ import com.oxiane.formation.devoxx22.refacto.services.jpa.VistamboireRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 
 @RestController
@@ -33,6 +31,9 @@ public class FactureController {
 
     @Autowired
     VistamboireRepository vistamboireRepository;
+
+    @Autowired
+    FacturePrinter printer;
 
     private Logger LOGGER = LoggerFactory.getLogger(FactureController.class);
 
@@ -63,5 +64,13 @@ public class FactureController {
     public Iterable<Facture> getFactures() {
         LOGGER.info("getFactures()");
         return repository.findAll();
+    }
+
+    @GetMapping(value = "/{id}/print", produces = MediaType.TEXT_PLAIN_VALUE)
+    public String printFacture(@PathVariable Long id) {
+        LOGGER.info("printFacture({})", id);
+        Facture facture = getFacture(id);
+        Vistamboire vistamboire = vistamboireRepository.findByValidAtDate(facture.getDate());
+        return printer.printFacture(facture, vistamboire);
     }
 }
