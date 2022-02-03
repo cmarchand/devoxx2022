@@ -27,7 +27,8 @@ public class DatabaseStructUpdater implements BeanPostProcessor {
      * Scripts that must be run on database when application starts
      */
     public static final String[] SCRIPTS = {
-            "facture-qte.sql"
+            "facture-qte.sql",
+            "client-type.sql"
     };
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseStructUpdater.class);
