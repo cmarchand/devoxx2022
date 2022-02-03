@@ -4,10 +4,17 @@ import javax.persistence.*;
 
 @Entity
 public class Client {
+    @Transient
+    public static final String TYPE_PARTICULIER = "PARTICULIER";
+    @Transient
+    public static final String TYPE_PROFESSIONNEL = "PROFESSIONNEL";
+
+
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String nom;
     private String prenom;
+    private String type;
     @ManyToOne
     private Adresse adresse;
 
@@ -18,11 +25,22 @@ public class Client {
         this.nom=nom;
         this.prenom=prenom;
         this.adresse=adresse;
+        type = TYPE_PARTICULIER;
     }
     public Client(String nom, String prenom, Adresse adresse) {
-        this(null, nom, prenom, adresse);
+        this((Long)null, nom, prenom, adresse);
     }
-
+    public Client(Long id, String nom, String prenom, String type, Adresse adresse) {
+        this();
+        this.id = id;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.type = type;
+        this.adresse = adresse;
+    }
+    public Client(String nom, String prenom, String type, Adresse adresse) {
+        this(null, nom, prenom, type, adresse);
+    }
     public Long getId() {
         return id;
     }
@@ -60,6 +78,7 @@ public class Client {
                 "id=" + id +
                 ", nom='" + nom + '\'' +
                 ", prenom='" + prenom + '\'' +
+                ", type='" + type + '\'' +
                 '}';
     }
 }

@@ -50,13 +50,17 @@ public class ClientController {
     public Client createClient(
             @RequestParam String nom,
             @RequestParam String prenom,
+            @RequestParam(required = false, defaultValue = "PARTICULIER") String type,
             @RequestParam Long adresseId) {
+        if(!Client.TYPE_PARTICULIER.equals(type) && !Client.TYPE_PROFESSIONNEL.equals(type)) {
+            throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED, "Type de client non supporté: "+type);
+        }
         Adresse adresse = adresseRepository
                 .findById(adresseId)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Adresse inconnue: "+adresseId)
                 );
-        Client client = new Client(nom, prenom, adresse);
+        Client client = new Client(nom, prenom, type, adresse);
         return repository.save(client);
     }
 
