@@ -4,6 +4,8 @@ import com.oxiane.formation.devoxx22.refacto.helpers.FacturePrinter;
 import com.oxiane.formation.devoxx22.refacto.helpers.PrixUnitCalculateur;
 import com.oxiane.formation.devoxx22.refacto.helpers.impl.FacturePrinterImpl;
 import com.oxiane.formation.devoxx22.refacto.helpers.impl.PrixUnitCalculateurImpl;
+import com.oxiane.formation.devoxx22.refacto.services.jdbc.DatabaseValuesExtractor;
+import com.oxiane.formation.devoxx22.refacto.services.jpa.spi.DatabaseValuesExtractorImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,4 +17,8 @@ public class VistamboireConfig {
 
     @Bean
     public PrixUnitCalculateur prixUnitCalculateur() { return new PrixUnitCalculateurImpl(); }
+
+    @Bean
+    public DatabaseValuesExtractor databaseValuesExtractor() { return new DatabaseValuesExtractorImpl(); }
+
 }

@@ -8,8 +8,8 @@ import com.oxiane.formation.devoxx22.refacto.model.Vistamboire;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.ClientRepository;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.FactureRepository;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.VistamboireRepository;
+import com.oxiane.formation.devoxx22.refacto.services.jpa.spi.DatabaseValuesExtractorImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import com.oxiane.formation.devoxx22.refacto.services.jpa.spi.DatabaseValuesExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class FactureController {
     FacturePrinter printer;
 
     @Autowired
-    DatabaseValuesExtractor valuesExtractor;
+    DatabaseValuesExtractorImpl databaseValuesExtractor;
 
     @Autowired
     PrixUnitCalculateur prixUnitCalculateur;
@@ -57,7 +57,7 @@ public class FactureController {
                 .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client inconnu: "+clientId));
         Facture facture = new Facture(client, new GregorianCalendar(), qte);
         Vistamboire vistamboire = vistamboireRepository.findByValidAtDate(facture.getDate());
-        int qteDejaAchetee = valuesExtractor.getQuantiteDejaCommandeeCetteAnnee(clientId, facture.getDate());
+        int qteDejaAchetee = databaseValuesExtractor.getQuantiteDejaCommandeeCetteAnnee(clientId, facture.getDate());
         vistamboire.setPrixUnitaireHT(prixUnitCalculateur.calculatePrixUnit(vistamboire, client));
         facture.setRemiseClient(prixUnitCalculateur.calculateRemiseClient(client, qteDejaAchetee, qte));
         facture.calculate(vistamboire);

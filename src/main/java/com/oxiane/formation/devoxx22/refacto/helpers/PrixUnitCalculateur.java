@@ -17,7 +17,7 @@ public interface PrixUnitCalculateur {
 
     /**
      * Renvoie le pourcentage de remise à appliquer à la facture pour un client professionnel, qui a déjà
-     * acheté un nombre connu de vistamboires dans lannée, et qui en rachète.
+     * acheté un nombre connu de vistamboires dans l'année, et qui en rachète.
      *
      * @param client
      * @param qteDejaAcheter

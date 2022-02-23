@@ -133,4 +133,8 @@ public class Adresse {
         NonEmptyStringJoiner joiner = new NonEmptyStringJoiner("\n");
         return joiner.add(adresse1).add(adresse2).add(adresse3).toString();
     }
+
+    public String getDepartement() {
+        return getCodepostal().substring(0, 2);
+    }
 }
