@@ -20,7 +20,7 @@ public class DatabaseValuesExtractor {
             Date startOfYear = new Date(date.get(Calendar.YEAR), 0, 1);
             Date startOfNextYear = new Date(date.get(Calendar.YEAR)+1, 0, 1);
             PreparedStatement ps = connection.prepareStatement("""
-                    select count(*) from FACTURE 
+                    select sum(QTE) from FACTURE 
                     where CLIENT_ID=? and DATE>=? and DATE<?
                     """);
             ps.setLong(1, clientId);
