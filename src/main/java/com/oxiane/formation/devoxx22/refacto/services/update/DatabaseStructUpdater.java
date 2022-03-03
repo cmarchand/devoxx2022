@@ -30,7 +30,8 @@ public class DatabaseStructUpdater implements BeanPostProcessor {
             "facture-qte.sql",
             "client-type.sql",
             "facture-remise.sql",
-            "secteur-geographique.sql"
+            "secteur-geographique.sql",
+            "promotion.sql"
     };
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseStructUpdater.class);

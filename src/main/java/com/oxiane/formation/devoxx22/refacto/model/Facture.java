@@ -2,7 +2,9 @@ package com.oxiane.formation.devoxx22.refacto.model;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 @Entity
 public class Facture {
@@ -18,8 +20,16 @@ public class Facture {
     private int qte;
     @Column(name = "REMISE")
     private BigDecimal remiseClient;
+    @ManyToMany
+    @JoinTable(
+            name = "FACTURE_PROMOTION",
+            joinColumns = @JoinColumn(name="ID_FACTURE", referencedColumnName = "ID"),
+            inverseJoinColumns = @JoinColumn(name = "ID_PROMOTION", referencedColumnName = "ID")
+    )
+    private List<Promotion> promotions;
 
     public Facture() {
+        promotions = new ArrayList<>();
     }
     public Facture(long id, Client client, Calendar date, BigDecimal totalHT, BigDecimal totalTVA, BigDecimal totalTTC) {
         this();
@@ -68,6 +78,10 @@ public class Facture {
 
     public int getQte() { return qte; }
 
+    public List<Promotion> getPromotions() {
+        return promotions;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -100,6 +114,14 @@ public class Facture {
         if(!BigDecimal.ZERO.equals(remiseClient)) {
             BigDecimal multiplicateurRemise = BigDecimal.ONE.min(remiseClient);
             totalHT = totalHT.multiply(multiplicateurRemise);
+        }
+        // application des promotions
+        for(Promotion promotion: getPromotions()) {
+            if(promotion.getMontantRemise()!=null) {
+                totalHT = totalHT.subtract(promotion.getMontantRemise());
+            } else {
+                totalHT = totalHT.multiply(BigDecimal.ONE.subtract(promotion.getPourcentageRemise()));
+            }
         }
         totalTVA = totalHT.multiply(vistamboire.getTauxTVA());
         totalTTC = totalHT.add(totalTVA);

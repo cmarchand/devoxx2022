@@ -1,10 +1,7 @@
 package com.oxiane.formation.devoxx22.refacto.helpers.impl;
 
 import com.oxiane.formation.devoxx22.refacto.helpers.FacturePrinter;
-import com.oxiane.formation.devoxx22.refacto.model.Adresse;
-import com.oxiane.formation.devoxx22.refacto.model.Facture;
-import com.oxiane.formation.devoxx22.refacto.model.SecteurGeographique;
-import com.oxiane.formation.devoxx22.refacto.model.Vistamboire;
+import com.oxiane.formation.devoxx22.refacto.model.*;
 import com.oxiane.formation.devoxx22.refacto.services.jdbc.DatabaseValuesExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +12,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 public class FacturePrinterImpl implements FacturePrinter {
+    private static final BigDecimal HUNDRED = BigDecimal.TEN.multiply(BigDecimal.TEN);
     @Autowired
     private DatabaseValuesExtractor databaseValuesExtractor;
 
@@ -40,6 +38,18 @@ public class FacturePrinterImpl implements FacturePrinter {
                                                 Montant Total TVA : %12$10.2f €
                                                 Montant Total TTC : %13$10.2f €
             """;
+    private static final String PRINT_TEMPLATE_PROMOTION_HEADER = """
+            Promotions
+            ____________________________________________________________________
+            | Désignation                              | Montant | Pourcentage |
+            |------------------------------------------|---------|-------------|
+            """;
+    private static final String PRINT_TEMPLATE_PROMOTION_ROW = """
+            | %1$-40s | %2$7s | %3$11s |
+            """;
+    private static final String PRINT_TEMPLATE_PROMOTION_FOOTER = """
+            ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+            """;
     private static final DateFormat DATE_FORMATTER = new SimpleDateFormat("dd-MM-yyyy");
     private static final Logger LOGGER = LoggerFactory.getLogger(FacturePrinterImpl.class);
     private static final String VISTAMBOIRE_INOX = "Vistamboire inoxydable";
@@ -64,6 +74,26 @@ public class FacturePrinterImpl implements FacturePrinter {
                 facture.getQte(),                                           // 14
                 getLibelleVistamboire(facture.getClient().getAdresse()))    // 15
         );
+        if(!facture.getPromotions().isEmpty()) {
+            sb.append(PRINT_TEMPLATE_PROMOTION_HEADER);
+            for(Promotion promotion: facture.getPromotions()) {
+                String montantPromotion =
+                        promotion.getMontantRemise()==null ?
+                                "" :
+                                String.format("%1$4.2f", promotion.getMontantRemise());
+                String pourcentagePromotion =
+                        promotion.getPourcentageRemise()==null ?
+                                "" :
+                                String.format("%1$2.2f %%", promotion.getPourcentageRemise().multiply(HUNDRED));
+                sb.append(
+                        String.format(
+                                PRINT_TEMPLATE_PROMOTION_ROW,
+                                promotion.getNom(),
+                                montantPromotion,
+                                pourcentagePromotion));
+            }
+            sb.append(PRINT_TEMPLATE_PROMOTION_FOOTER);
+        }
         if(!BigDecimal.ZERO.equals(facture.getRemiseClient())) {
             sb.append(String.format(PRINT_TEMPLATE_DISCOUNT, facture.getRemiseClient().multiply(BigDecimal.valueOf(100))));
         }

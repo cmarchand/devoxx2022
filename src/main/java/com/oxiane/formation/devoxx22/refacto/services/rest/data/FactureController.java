@@ -4,9 +4,11 @@ import com.oxiane.formation.devoxx22.refacto.helpers.FacturePrinter;
 import com.oxiane.formation.devoxx22.refacto.helpers.PrixUnitCalculateur;
 import com.oxiane.formation.devoxx22.refacto.model.Client;
 import com.oxiane.formation.devoxx22.refacto.model.Facture;
+import com.oxiane.formation.devoxx22.refacto.model.Promotion;
 import com.oxiane.formation.devoxx22.refacto.model.Vistamboire;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.ClientRepository;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.FactureRepository;
+import com.oxiane.formation.devoxx22.refacto.services.jpa.PromotionRepository;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.VistamboireRepository;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.spi.DatabaseValuesExtractorImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,7 +20,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 
 @RestController
@@ -45,23 +49,54 @@ public class FactureController {
     @Autowired
     PrixUnitCalculateur prixUnitCalculateur;
 
+    @Autowired
+    PromotionRepository promotionRepository;
+
     private Logger LOGGER = LoggerFactory.getLogger(FactureController.class);
 
     @PostMapping("/")
     public Facture createFacture(
             @RequestParam Long clientId,
-            @RequestParam(required = false, defaultValue = "1") int qte
-        ) {
+            @RequestParam(required = false, defaultValue = "1") int qte) {
         Client client = clientRepository
                 .findById(clientId)
-                .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client inconnu: "+clientId));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client inconnu: " + clientId));
         Facture facture = new Facture(client, new GregorianCalendar(), qte);
         Vistamboire vistamboire = vistamboireRepository.findByValidAtDate(facture.getDate());
         int qteDejaAchetee = databaseValuesExtractor.getQuantiteDejaCommandeeCetteAnnee(clientId, facture.getDate());
         vistamboire.setPrixUnitaireHT(prixUnitCalculateur.calculatePrixUnit(vistamboire, client));
         facture.setRemiseClient(prixUnitCalculateur.calculateRemiseClient(client, qteDejaAchetee, qte));
+        List<Promotion> availablePromotions = promotionRepository.findPromotionsValidAtDate(facture.getDate());
+        // on regarde si il y a des promotions exclusives, dans ce cas on ne garde que celles-là
+        List<Promotion> exclusivePromotions = availablePromotions
+                .stream()
+                .filter(Promotion::isExclusive)
+                .toList();
+        if(exclusivePromotions.isEmpty()) {
+            facture.getPromotions().addAll(availablePromotions);
+        } else {
+            facture.calculate(vistamboire);
+            Promotion bestPromotion = null;
+            BigDecimal bestPromotionAmount = BigDecimal.ZERO;
+            for(Promotion promotion: exclusivePromotions) {
+                BigDecimal currentPromotionAmount = getRemiseAmountOfPromotionAppliedTo(promotion, facture);
+                if (currentPromotionAmount.compareTo(bestPromotionAmount) > 0) {
+                    bestPromotion = promotion;
+                    bestPromotionAmount = currentPromotionAmount;
+                }
+            }
+            facture.getPromotions().add(bestPromotion);
+        }
         facture.calculate(vistamboire);
         return repository.save(facture);
+    }
+
+    private BigDecimal getRemiseAmountOfPromotionAppliedTo(Promotion promotion, Facture facture) {
+        if(promotion.getMontantRemise()!=null) {
+            return promotion.getMontantRemise();
+        } else {
+            return facture.getTotalHT().multiply(promotion.getPourcentageRemise());
+        }
     }
 
     @GetMapping("/{id}")
@@ -70,7 +105,7 @@ public class FactureController {
         return repository
                 .findById(id)
                 .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Facture inconnue: "+id)
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Facture inconnue: " + id)
                 );
     }
 
