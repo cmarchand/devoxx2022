@@ -6,6 +6,7 @@ import com.oxiane.formation.devoxx22.refacto.model.Client;
 import com.oxiane.formation.devoxx22.refacto.model.Facture;
 import com.oxiane.formation.devoxx22.refacto.model.Vistamboire;
 import com.oxiane.formation.devoxx22.refacto.services.jdbc.DatabaseValuesExtractor;
+import com.oxiane.formation.devoxx22.refacto.model.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,17 +57,12 @@ public class FacturePrinterTest {
     private FacturePrinter printer;
 
     @Test
-    public void given_facture_with_qte_1_and_vistamboire_print_output_shouldbe_full() {
+    public void given_facture_no_promotion_with_qte_1_and_vistamboire_print_output_shouldbe_full() {
         // GIVEN
-        Adresse adresse = new Adresse(1L, null, "98 Boulevard Soult", null, "75012", "Paris", "France");
-        Client client = new Client(1L,"Chombier", "Michel", adresse);
+        Adresse adresse = getAdresseSecteurGeoAutre();
+        Client client = getClientMichelChombier(adresse);
         Facture facture = new Facture(client, FIXED_DATE);
-        Vistamboire vistamboire = new Vistamboire(
-                BigDecimal.TEN,
-                new BigDecimal(0.2d),
-                new BigDecimal(1),
-                LOWER_BOUND,
-                UPPER_BOUND);
+        Vistamboire vistamboire = getVistamboire();
         facture.calculate(vistamboire);
         String expected = """
                 Facture null / 31-01-2022
@@ -85,25 +81,16 @@ public class FacturePrinterTest {
                                                     Montant Total TVA :       2,00 €
                                                     Montant Total TTC :      12,00 €
                 """;
-        // WHEN
-        String actual = printer.printFacture(facture, vistamboire);
-
-        // THEN
-        Assertions.assertThat(actual).isEqualTo(expected);
+        // Then
+        verifyFactureCorrectlyPrinted(facture, vistamboire, expected);
     }
-
     @Test
-    public void given_facture_with_qte_2_and_vistamboire_print_output_shouldbe_full() {
+    public void given_facture_no_promotion_with_qte_2_and_vistamboire_print_output_shouldbe_full() {
         // GIVEN
-        Adresse adresse = new Adresse(1L, null, "98 Boulevard Soult", null, "75012", "Paris", "France");
-        Client client = new Client(1L,"Chombier", "Michel", adresse);
+        Adresse adresse = getAdresseSecteurGeoAutre();
+        Client client = getClientMichelChombier(adresse);
         Facture facture = new Facture(client, FIXED_DATE, 2);
-        Vistamboire vistamboire = new Vistamboire(
-                BigDecimal.TEN,
-                new BigDecimal(0.2d),
-                new BigDecimal(1),
-                LOWER_BOUND,
-                UPPER_BOUND);
+        Vistamboire vistamboire = getVistamboire();
         facture.calculate(vistamboire);
         String expected = """
             Facture null / 31-01-2022
@@ -122,25 +109,17 @@ public class FacturePrinterTest {
                                                 Montant Total TVA :       4,00 €
                                                 Montant Total TTC :      24,00 €
             """;
-        // WHEN
-        String actual = printer.printFacture(facture, vistamboire);
-
-        // THEN
-        Assertions.assertThat(actual).isEqualTo(expected);
+        // then
+        verifyFactureCorrectlyPrinted(facture, vistamboire, expected);
     }
     @Test
-    public void given_facture_with_remise_and_vistamboire_print_output_shouldbe_full() {
+    public void given_facture_no_promotion_with_remise_and_vistamboire_print_output_shouldbe_full() {
         // GIVEN
-        Adresse adresse = new Adresse(1L, null, "98 Boulevard Soult", null, "75012", "Paris", "France");
-        Client client = new Client(1L,"Chombier", "Michel", adresse);
+        Adresse adresse = getAdresseSecteurGeoAutre();
+        Client client = getClientMichelChombier(adresse);
         Facture facture = new Facture(client, FIXED_DATE, 2);
         facture.setRemiseClient(BigDecimal.valueOf(0.5));
-        Vistamboire vistamboire = new Vistamboire(
-                BigDecimal.TEN,
-                new BigDecimal(0.2d),
-                new BigDecimal(1),
-                LOWER_BOUND,
-                UPPER_BOUND);
+        Vistamboire vistamboire = getVistamboire();
         facture.calculate(vistamboire);
         String expected = """
             Facture null / 31-01-2022
@@ -160,25 +139,17 @@ public class FacturePrinterTest {
                                                 Montant Total TVA :       2,00 €
                                                 Montant Total TTC :      12,00 €
             """;
-        // WHEN
-        String actual = printer.printFacture(facture, vistamboire);
-
-        // THEN
-        Assertions.assertThat(actual).isEqualTo(expected);
+        // then
+        verifyFactureCorrectlyPrinted(facture, vistamboire, expected);
     }
     @Test
-    public void given_facture_with_adresse_secteur_geo_maritime_and_vistamboire_label_should_be_Vistamboire_inoxydable() {
+    public void given_facture_no_promotion_with_adresse_secteur_geo_maritime_and_vistamboire_label_should_be_Vistamboire_inoxydable() {
         // GIVEN
-        Adresse adresse = new Adresse(1L, null, "52 rue Lord Kitchener", null, "76600", "Le Havre", "France");
-        Client client = new Client(1L,"Chombier", "Michel", adresse);
+        Adresse adresse = getAdresseSecteurGeoMaritime();
+        Client client = getClientMichelChombier(adresse);
         Facture facture = new Facture(client, FIXED_DATE, 2);
         facture.setRemiseClient(BigDecimal.valueOf(0.5));
-        Vistamboire vistamboire = new Vistamboire(
-                BigDecimal.TEN,
-                new BigDecimal(0.2d),
-                new BigDecimal(1),
-                LOWER_BOUND,
-                UPPER_BOUND);
+        Vistamboire vistamboire = getVistamboire();
         facture.calculate(vistamboire);
         String expected = """
             Facture null / 31-01-2022
@@ -198,10 +169,67 @@ public class FacturePrinterTest {
                                                 Montant Total TVA :       2,00 €
                                                 Montant Total TTC :      12,00 €
             """;
-        // WHEN
-        String actual = printer.printFacture(facture, vistamboire);
+        // then
+        verifyFactureCorrectlyPrinted(facture, vistamboire, expected);
+    }
+    @Test
+    public void given_facture_promotion_10percent_with_remise_and_vistamboire_print_output_shouldbe_full() {
+        // GIVEN
+        Adresse adresse = getAdresseSecteurGeoAutre();
+        Client client = getClientMichelChombier(adresse);
+        Facture facture = new Facture(client, FIXED_DATE, 2);
+        facture.setRemiseClient(BigDecimal.valueOf(0.5));
+        Promotion promotion = new Promotion(LOWER_BOUND, UPPER_BOUND, "Mardi Gras", null, BigDecimal.valueOf(0.1),true);
+        facture.getPromotions().add(promotion);
+        Vistamboire vistamboire = getVistamboire();
+        facture.calculate(vistamboire);
+        String expected = """
+            Facture null / 31-01-2022
+            
+            Michel Chombier
+            98 Boulevard Soult
+            75012 Paris
+            France
+    
+            ____________________________________________________________________
+            | Article                    | Prix Unitaire | Quantité | Taux TVA |
+            |----------------------------|---------------|----------|----------|
+            | Vistamboire coins nickelés |         10,00 |        2 |     0,20 |
+            ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+            Promotions
+            ____________________________________________________________________
+            | Désignation                              | Montant | Pourcentage |
+            |------------------------------------------|---------|-------------|
+            | Mardi Gras                               |         |     10,00 % |
+            ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+                                                Remise            :      50,00 %
+                                                Montant Hors Taxe :       9,00 €
+                                                Montant Total TVA :       1,80 €
+                                                Montant Total TTC :      10,80 €
+            """;
+        // then
+        verifyFactureCorrectlyPrinted(facture, vistamboire, expected);
+    }
 
-        // THEN
+    private Adresse getAdresseSecteurGeoMaritime() {
+        return new Adresse(1L, null, "52 rue Lord Kitchener", null, "76600", "Le Havre", "France");
+    }
+    private Adresse getAdresseSecteurGeoAutre() {
+        return new Adresse(1L, null, "98 Boulevard Soult", null, "75012", "Paris", "France");
+    }
+    private Vistamboire getVistamboire() {
+        return new Vistamboire(
+                BigDecimal.TEN,
+                new BigDecimal(0.2d),
+                new BigDecimal(1),
+                LOWER_BOUND,
+                UPPER_BOUND);
+    }
+    private Client getClientMichelChombier(Adresse adresse) {
+        return new Client(1L, "Chombier", "Michel", adresse);
+    }
+    private void verifyFactureCorrectlyPrinted(Facture facture, Vistamboire vistamboire, String expected) {
+        String actual = printer.printFacture(facture, vistamboire);
         Assertions.assertThat(actual).isEqualTo(expected);
     }
 }
