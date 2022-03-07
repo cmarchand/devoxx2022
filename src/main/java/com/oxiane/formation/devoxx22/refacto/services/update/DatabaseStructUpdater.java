@@ -28,7 +28,8 @@ public class DatabaseStructUpdater implements BeanPostProcessor {
      */
     public static final String[] SCRIPTS = {
             "facture-qte.sql",
-            "client-type.sql"
+            "client-type.sql",
+            "facture-remise.sql"
     };
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseStructUpdater.class);

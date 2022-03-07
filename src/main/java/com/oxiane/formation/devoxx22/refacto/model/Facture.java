@@ -16,6 +16,8 @@ public class Facture {
     private BigDecimal totalTVA;
     private BigDecimal totalTTC;
     private int qte;
+    @Column(name = "REMISE")
+    private BigDecimal remiseClient;
 
     public Facture() {
     }
@@ -27,12 +29,14 @@ public class Facture {
         this.totalHT = totalHT;
         this.totalTVA = totalTVA;
         this.totalTTC = totalTTC;
+        this.remiseClient = BigDecimal.ZERO;
     }
     public Facture(Client client, Calendar date, int qte) {
         this();
         this.client = client;
         this.date = date;
         this.qte = qte;
+        this.remiseClient = BigDecimal.ZERO;
     }
     public Facture(Client client, Calendar date) {
         this(client, date, 1);
@@ -93,7 +97,19 @@ public class Facture {
 
     public void calculate(Vistamboire vistamboire) {
         totalHT = vistamboire.getPrixUnitaireHT().multiply(BigDecimal.valueOf((long)qte));
+        if(!BigDecimal.ZERO.equals(remiseClient)) {
+            BigDecimal multiplicateurRemise = BigDecimal.ONE.min(remiseClient);
+            totalHT = totalHT.multiply(multiplicateurRemise);
+        }
         totalTVA = totalHT.multiply(vistamboire.getTauxTVA());
         totalTTC = totalHT.add(totalTVA);
+    }
+
+    public void setRemiseClient(BigDecimal remiseClient) {
+        this.remiseClient = remiseClient;
+    }
+
+    public BigDecimal getRemiseClient() {
+        return remiseClient;
     }
 }

@@ -14,6 +14,7 @@ public class Client {
     private Long id;
     private String nom;
     private String prenom;
+    @Column(name = "NATURE")
     private String type;
     @ManyToOne
     private Adresse adresse;
@@ -35,6 +36,9 @@ public class Client {
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
+        if(!TYPE_PARTICULIER.equals(type) && !TYPE_PROFESSIONNEL.equals(type)) {
+            throw new RuntimeException("Un client doit être "+TYPE_PARTICULIER+" ou "+TYPE_PROFESSIONNEL);
+        }
         this.type = type;
         this.adresse = adresse;
     }
@@ -81,4 +85,6 @@ public class Client {
                 ", type='" + type + '\'' +
                 '}';
     }
+
+    public String getType() { return type; }
 }

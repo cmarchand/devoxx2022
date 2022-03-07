@@ -43,4 +43,8 @@ public class Vistamboire {
     public Calendar getValidUntil() {
         return validUntil;
     }
+
+    public void setPrixUnitaireHT(BigDecimal prixUnitaireHT) {
+        this.prixUnitaireHT = prixUnitaireHT;
+    }
 }
