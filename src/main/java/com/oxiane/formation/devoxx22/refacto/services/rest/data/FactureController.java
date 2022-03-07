@@ -7,6 +7,7 @@ import com.oxiane.formation.devoxx22.refacto.model.Vistamboire;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.ClientRepository;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.FactureRepository;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.VistamboireRepository;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import java.util.GregorianCalendar;
 
 @RestController
 @RequestMapping("/api/factures")
+@Tag(name="Factures", description = "Gestion de la facturation")
 public class FactureController {
     private static final String CR = System.getProperty("line.separator");
     private static final String TAB = "\t";

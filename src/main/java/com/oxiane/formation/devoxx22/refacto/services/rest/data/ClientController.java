@@ -4,6 +4,7 @@ import com.oxiane.formation.devoxx22.refacto.model.Adresse;
 import com.oxiane.formation.devoxx22.refacto.model.Client;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.AdresseRepository;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.ClientRepository;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/clients")
+@Tag(name="Clients", description = "Gestion des clients")
 public class ClientController {
     private static Logger LOGGER = LoggerFactory.getLogger(ClientController.class);
     @Autowired

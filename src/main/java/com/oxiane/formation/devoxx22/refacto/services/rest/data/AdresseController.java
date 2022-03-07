@@ -12,7 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/adresses")
-@Tag(name="adresses", description = "Manipulation des adresses")
+@Tag(name="Adresses", description = "Gestion des adresses")
 public class AdresseController {
     @Autowired
     AdresseRepository repository;
