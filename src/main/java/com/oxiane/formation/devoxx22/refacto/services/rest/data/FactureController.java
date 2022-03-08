@@ -57,7 +57,7 @@ public class FactureController {
                 .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client inconnu: "+clientId));
         Facture facture = new Facture(client, new GregorianCalendar(), qte);
         Vistamboire vistamboire = vistamboireRepository.findByValidAtDate(facture.getDate());
-        int qteDejaAchetee = valuesExtractor.getQuantiteDejaCommandeeCetteAnnee(clientId, new GregorianCalendar());
+        int qteDejaAchetee = valuesExtractor.getQuantiteDejaCommandeeCetteAnnee(clientId, facture.getDate());
         vistamboire.setPrixUnitaireHT(prixUnitCalculateur.calculatePrixUnit(vistamboire, client));
         facture.setRemiseClient(prixUnitCalculateur.calculateRemiseClient(client, qteDejaAchetee, qte));
         facture.calculate(vistamboire);

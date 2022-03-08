@@ -17,8 +17,10 @@ public class DatabaseValuesExtractor {
 
     public int getQuantiteDejaCommandeeCetteAnnee(Long clientId, Calendar date) {
         try(Connection connection = dataSource.getConnection()) {
-            Date startOfYear = new Date(date.get(Calendar.YEAR), 0, 1);
-            Date startOfNextYear = new Date(date.get(Calendar.YEAR)+1, 0, 1);
+            Calendar lowerBondCalendar = (Calendar)date.clone();
+            lowerBondCalendar.add(Calendar.YEAR, -1);
+            Date startOfYear = new Date(lowerBondCalendar.getTimeInMillis());
+            Date startOfNextYear = new Date(date.getTimeInMillis());
             PreparedStatement ps = connection.prepareStatement("""
                     select sum(QTE) from FACTURE 
                     where CLIENT_ID=? and DATE>=? and DATE<?
@@ -27,11 +29,9 @@ public class DatabaseValuesExtractor {
             ps.setDate(2, startOfYear);
             ps.setDate(3, startOfNextYear);
             ResultSet rs = ps.executeQuery();
-            if(rs.next()) {
-                return rs.getInt(1);
-            } else {
-                return 0;
-            }
+            rs.next();
+            int qte = rs.getInt(1);
+            return rs.wasNull() ? 0 : qte;
         } catch (SQLException ex) {
             LOGGER.error("getQuantiteDejaCommandeeCetteAnnee({},{})", ex, clientId, date);
             return 0;

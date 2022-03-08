@@ -27,9 +27,9 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
         if(Client.TYPE_PARTICULIER.equals(client.getType())) return BigDecimal.ZERO;
         int qteFinale = qteDejaAchetee + quantite;
         BigDecimal remise;
-        if (qteFinale > 50) remise = new BigDecimal(0.2);
-        else if (qteFinale > 20) remise = new BigDecimal(0.15);
-        else if (qteFinale > 10) remise = new BigDecimal(0.1);
+        if (qteFinale > 50) remise = BigDecimal.valueOf(0.2);
+        else if (qteFinale > 20) remise = BigDecimal.valueOf(0.15);
+        else if (qteFinale > 10) remise = BigDecimal.valueOf(0.1);
         else remise = BigDecimal.ZERO;
         return remise;
     }
