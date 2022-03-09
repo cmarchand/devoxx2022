@@ -72,17 +72,16 @@ public class PromotionController {
                 .toList();
     }
 
-
-    public record PromotionRecord(Long id, Calendar dateDebut, Calendar dateFin, String nom, BigDecimal montantRemise, BigDecimal pourcentageRemise, boolean exclusive) {
+    public record PromotionRecord(Long id, PeriodeValidite periode, String nom, Remise remise, boolean exclusive) {
         PromotionRecord(Promotion promotion) {
             this(
                     promotion.getId(),
-                    promotion.getDateDebut(),
-                    promotion.getDateFin(),
+                    new PeriodeValidite(promotion.getDateDebut(), promotion.getDateFin()),
                     promotion.getNom(),
-                    promotion.getMontantRemise(),
-                    promotion.getPourcentageRemise(),
+                    new Remise(promotion.getMontantRemise(), promotion.getPourcentageRemise()),
                     promotion.isExclusive());
         }
     }
+    public record PeriodeValidite(Calendar dateDebut, Calendar dateFin){};
+    public record Remise(BigDecimal montant, BigDecimal pourcentage){};
 }
