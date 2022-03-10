@@ -74,4 +74,15 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>sonar</id>
+			<properties>
+				<sonar.host.url>http://localhost:9000</sonar.host.url>
+				<sonar.login>e27a426d74da781835c97145432fe9a1861a3a2c</sonar.login>
+				<sonar.projectKey>cmarchand_vistamboire_AX9uACxUdBALvYZFF1KZ</sonar.projectKey>
+			</properties>
+		</profile>
+	</profiles>
+
 </project>
