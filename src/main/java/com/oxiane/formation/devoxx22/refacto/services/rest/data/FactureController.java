@@ -59,14 +59,7 @@ public class FactureController {
     public Facture createFacture(
             @RequestParam Long clientId,
             @RequestParam(required = false, defaultValue = "1") int qte) {
-        Client client = findClientById(clientId);
-        Facture facture = new Facture(client, new GregorianCalendar(), qte);
-        Vistamboire vistamboire = getVistamboireForFacture(facture);
-        facture.setRemiseClient(calculateRemiseClientForFacture(facture));
-        facture.calculate(vistamboire);
-        applyPromotionsToFacture(facture);
-        facture.calculate(vistamboire);
-        return repository.save(facture);
+        return createAndSaveFacture(clientId, qte);
     }
 
     @GetMapping("/{id}")
@@ -91,6 +84,21 @@ public class FactureController {
         Facture facture = getFacture(id);
         Vistamboire vistamboire = vistamboireRepository.findByValidAtDate(facture.getDate());
         return printer.printFacture(facture, vistamboire);
+    }
+
+    private Facture createAndSaveFacture(Long clientId, int qte) {
+        Client client = findClientById(clientId);
+        Facture facture = new Facture(client, getCurrentDate(), qte);
+        Vistamboire vistamboire = getVistamboireForFacture(facture);
+        facture.setRemiseClient(calculateRemiseClientForFacture(facture));
+        facture.calculate(vistamboire);
+        applyPromotionsToFacture(facture);
+        facture.calculate(vistamboire);
+        return repository.save(facture);
+    }
+
+    private GregorianCalendar getCurrentDate() {
+        return new GregorianCalendar();
     }
 
     private void applyPromotionsToFacture(Facture facture) {
