@@ -60,7 +60,7 @@ public class FactureController {
             @RequestParam(required = false, defaultValue = "1") int qte) {
         Client client = findClientById(clientId);
         Facture facture = new Facture(client, new GregorianCalendar(), qte);
-        Vistamboire vistamboire = getVistamboireForFacture(client, facture);
+        Vistamboire vistamboire = getVistamboireForFacture(facture);
         int qteDejaAchetee = databaseValuesExtractor.getQuantiteDejaCommandeeCetteAnnee(clientId, facture.getDate());
         facture.setRemiseClient(prixUnitCalculateur.calculateRemiseClient(client, qteDejaAchetee, qte));
         List<Promotion> availablePromotions = promotionRepository.findPromotionsValidAtDate(facture.getDate());
@@ -88,7 +88,7 @@ public class FactureController {
         return repository.save(facture);
     }
 
-    private Vistamboire getVistamboireForFacture(Client client, Facture facture) {
+    private Vistamboire getVistamboireForFacture(Facture facture) {
         Vistamboire vistamboire = vistamboireRepository.findByValidAtDate(facture.getDate());
         vistamboire.setPrixUnitaireHT(prixUnitCalculateur.calculatePrixUnit(vistamboire, facture.getClient()));
         return vistamboire;
