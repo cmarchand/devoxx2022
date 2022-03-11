@@ -63,6 +63,12 @@ public class FactureController {
         Vistamboire vistamboire = getVistamboireForFacture(facture);
         facture.setRemiseClient(calculateRemiseClientForFacture(facture));
         facture.calculate(vistamboire);
+        applyPromotionsToFacture(facture);
+        facture.calculate(vistamboire);
+        return repository.save(facture);
+    }
+
+    private void applyPromotionsToFacture(Facture facture) {
         List<Promotion> availablePromotions = promotionRepository.findPromotionsValidAtDate(facture.getDate());
         // on regarde si il y a des promotions exclusives, dans ce cas on ne garde que celles-là
         List<Promotion> exclusivePromotions = availablePromotions
@@ -83,8 +89,6 @@ public class FactureController {
             }
             facture.getPromotions().add(bestPromotion);
         }
-        facture.calculate(vistamboire);
-        return repository.save(facture);
     }
 
     private BigDecimal calculateRemiseClientForFacture(Facture facture) {
