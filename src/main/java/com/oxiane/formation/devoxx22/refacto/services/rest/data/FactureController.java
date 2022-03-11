@@ -58,9 +58,7 @@ public class FactureController {
     public Facture createFacture(
             @RequestParam Long clientId,
             @RequestParam(required = false, defaultValue = "1") int qte) {
-        Client client = clientRepository
-                .findById(clientId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client inconnu: " + clientId));
+        Client client = findClientById(clientId);
         Facture facture = new Facture(client, new GregorianCalendar(), qte);
         Vistamboire vistamboire = vistamboireRepository.findByValidAtDate(facture.getDate());
         int qteDejaAchetee = databaseValuesExtractor.getQuantiteDejaCommandeeCetteAnnee(clientId, facture.getDate());
@@ -89,6 +87,12 @@ public class FactureController {
         }
         facture.calculate(vistamboire);
         return repository.save(facture);
+    }
+
+    private Client findClientById(Long clientId) {
+        return clientRepository
+                .findById(clientId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client inconnu: " + clientId));
     }
 
     private BigDecimal getRemiseAmountOfPromotionAppliedTo(Promotion promotion, Facture facture) {
