@@ -61,8 +61,7 @@ public class FactureController {
         Client client = findClientById(clientId);
         Facture facture = new Facture(client, new GregorianCalendar(), qte);
         Vistamboire vistamboire = getVistamboireForFacture(facture);
-        int qteDejaAchetee = databaseValuesExtractor.getQuantiteDejaCommandeeCetteAnnee(clientId, facture.getDate());
-        facture.setRemiseClient(prixUnitCalculateur.calculateRemiseClient(client, qteDejaAchetee, qte));
+        facture.setRemiseClient(prixUnitCalculateur.calculateRemiseClient(client, databaseValuesExtractor.getQuantiteDejaCommandeeCetteAnnee(clientId, facture.getDate()), qte));
         List<Promotion> availablePromotions = promotionRepository.findPromotionsValidAtDate(facture.getDate());
         // on regarde si il y a des promotions exclusives, dans ce cas on ne garde que celles-là
         List<Promotion> exclusivePromotions = availablePromotions
