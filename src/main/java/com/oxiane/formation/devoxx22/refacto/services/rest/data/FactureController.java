@@ -75,7 +75,7 @@ public class FactureController {
                 .stream()
                 .filter(Promotion::isExclusive)
                 .toList();
-        if(exclusivePromotions.isEmpty()) {
+        if(thereIsNoExclusivePromotionIn(availablePromotions)) {
             facture.getPromotions().addAll(availablePromotions);
         } else {
             Promotion bestPromotion = null;
@@ -89,6 +89,12 @@ public class FactureController {
             }
             facture.getPromotions().add(bestPromotion);
         }
+    }
+
+    private boolean thereIsNoExclusivePromotionIn(List<Promotion> availablePromotions) {
+        return availablePromotions
+                .stream()
+                .noneMatch(Promotion::isExclusive);
     }
 
     private BigDecimal calculateRemiseClientForFacture(Facture facture) {
