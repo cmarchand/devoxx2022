@@ -81,16 +81,14 @@ public class FactureController {
 
     private Promotion getBestExclusivePromotionForFacture(Facture facture, List<Promotion> availablePromotions) {
         Promotion bestPromotion = null;
-        List<Promotion> exclusivePromotions = availablePromotions
-                .stream()
-                .filter(Promotion::isExclusive)
-                .toList();
         BigDecimal bestPromotionAmount = BigDecimal.ZERO;
-        for(Promotion promotion: exclusivePromotions) {
-            BigDecimal currentPromotionAmount = getRemiseAmountOfPromotionAppliedTo(promotion, facture);
-            if (currentPromotionAmount.compareTo(bestPromotionAmount) > 0) {
-                bestPromotion = promotion;
-                bestPromotionAmount = currentPromotionAmount;
+        for(Promotion promotion: availablePromotions) {
+            if(promotion.isExclusive()) {
+                BigDecimal currentPromotionAmount = getRemiseAmountOfPromotionAppliedTo(promotion, facture);
+                if (currentPromotionAmount.compareTo(bestPromotionAmount) > 0) {
+                    bestPromotion = promotion;
+                    bestPromotionAmount = currentPromotionAmount;
+                }
             }
         }
         return bestPromotion;
