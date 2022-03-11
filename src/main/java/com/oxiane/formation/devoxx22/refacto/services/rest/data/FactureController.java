@@ -74,21 +74,26 @@ public class FactureController {
         if(thereIsNoExclusivePromotionIn(availablePromotions)) {
             facture.getPromotions().addAll(availablePromotions);
         } else {
-            List<Promotion> exclusivePromotions = availablePromotions
-                    .stream()
-                    .filter(Promotion::isExclusive)
-                    .toList();
-            Promotion bestPromotion = null;
-            BigDecimal bestPromotionAmount = BigDecimal.ZERO;
-            for(Promotion promotion: exclusivePromotions) {
-                BigDecimal currentPromotionAmount = getRemiseAmountOfPromotionAppliedTo(promotion, facture);
-                if (currentPromotionAmount.compareTo(bestPromotionAmount) > 0) {
-                    bestPromotion = promotion;
-                    bestPromotionAmount = currentPromotionAmount;
-                }
-            }
+            Promotion bestPromotion = getBestExclusivePromotionForFacture(facture, availablePromotions);
             facture.getPromotions().add(bestPromotion);
         }
+    }
+
+    private Promotion getBestExclusivePromotionForFacture(Facture facture, List<Promotion> availablePromotions) {
+        Promotion bestPromotion = null;
+        List<Promotion> exclusivePromotions = availablePromotions
+                .stream()
+                .filter(Promotion::isExclusive)
+                .toList();
+        BigDecimal bestPromotionAmount = BigDecimal.ZERO;
+        for(Promotion promotion: exclusivePromotions) {
+            BigDecimal currentPromotionAmount = getRemiseAmountOfPromotionAppliedTo(promotion, facture);
+            if (currentPromotionAmount.compareTo(bestPromotionAmount) > 0) {
+                bestPromotion = promotion;
+                bestPromotionAmount = currentPromotionAmount;
+            }
+        }
+        return bestPromotion;
     }
 
     private boolean thereIsNoExclusivePromotionIn(List<Promotion> availablePromotions) {
