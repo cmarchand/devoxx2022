@@ -69,6 +69,30 @@ public class FactureController {
         return repository.save(facture);
     }
 
+    @GetMapping("/{id}")
+    public Facture getFacture(@PathVariable Long id) {
+        LOGGER.info("getFacture({})", id);
+        return repository
+                .findById(id)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Facture inconnue: " + id)
+                );
+    }
+
+    @GetMapping("/")
+    public Iterable<Facture> getFactures() {
+        LOGGER.info("getFactures()");
+        return repository.findAll();
+    }
+
+    @GetMapping(value = "/{id}/print", produces = MediaType.TEXT_PLAIN_VALUE)
+    public String printFacture(@PathVariable Long id) {
+        LOGGER.info("printFacture({})", id);
+        Facture facture = getFacture(id);
+        Vistamboire vistamboire = vistamboireRepository.findByValidAtDate(facture.getDate());
+        return printer.printFacture(facture, vistamboire);
+    }
+
     private void applyPromotionsToFacture(Facture facture) {
         List<Promotion> availablePromotions = promotionRepository.findPromotionsValidAtDate(facture.getDate());
         if(thereIsNoExclusivePromotionIn(availablePromotions)) {
@@ -123,29 +147,5 @@ public class FactureController {
         } else {
             return facture.getTotalHT().multiply(promotion.getPourcentageRemise());
         }
-    }
-
-    @GetMapping("/{id}")
-    public Facture getFacture(@PathVariable Long id) {
-        LOGGER.info("getFacture({})", id);
-        return repository
-                .findById(id)
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Facture inconnue: " + id)
-                );
-    }
-
-    @GetMapping("/")
-    public Iterable<Facture> getFactures() {
-        LOGGER.info("getFactures()");
-        return repository.findAll();
-    }
-
-    @GetMapping(value = "/{id}/print", produces = MediaType.TEXT_PLAIN_VALUE)
-    public String printFacture(@PathVariable Long id) {
-        LOGGER.info("printFacture({})", id);
-        Facture facture = getFacture(id);
-        Vistamboire vistamboire = vistamboireRepository.findByValidAtDate(facture.getDate());
-        return printer.printFacture(facture, vistamboire);
     }
 }
