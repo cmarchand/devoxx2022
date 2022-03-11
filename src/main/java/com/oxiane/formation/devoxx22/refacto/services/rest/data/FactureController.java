@@ -90,7 +90,7 @@ public class FactureController {
 
     private Vistamboire getVistamboireForFacture(Client client, Facture facture) {
         Vistamboire vistamboire = vistamboireRepository.findByValidAtDate(facture.getDate());
-        vistamboire.setPrixUnitaireHT(prixUnitCalculateur.calculatePrixUnit(vistamboire, client));
+        vistamboire.setPrixUnitaireHT(prixUnitCalculateur.calculatePrixUnit(vistamboire, facture.getClient()));
         return vistamboire;
     }
 
