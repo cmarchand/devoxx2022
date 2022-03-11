@@ -71,13 +71,13 @@ public class FactureController {
     private void applyPromotionsToFacture(Facture facture) {
         List<Promotion> availablePromotions = promotionRepository.findPromotionsValidAtDate(facture.getDate());
         // on regarde si il y a des promotions exclusives, dans ce cas on ne garde que celles-là
-        List<Promotion> exclusivePromotions = availablePromotions
-                .stream()
-                .filter(Promotion::isExclusive)
-                .toList();
         if(thereIsNoExclusivePromotionIn(availablePromotions)) {
             facture.getPromotions().addAll(availablePromotions);
         } else {
+            List<Promotion> exclusivePromotions = availablePromotions
+                    .stream()
+                    .filter(Promotion::isExclusive)
+                    .toList();
             Promotion bestPromotion = null;
             BigDecimal bestPromotionAmount = BigDecimal.ZERO;
             for(Promotion promotion: exclusivePromotions) {
