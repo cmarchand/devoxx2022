@@ -62,6 +62,7 @@ public class FactureController {
         Facture facture = new Facture(client, new GregorianCalendar(), qte);
         Vistamboire vistamboire = getVistamboireForFacture(facture);
         facture.setRemiseClient(calculateRemiseClientForFacture(facture));
+        facture.calculate(vistamboire);
         List<Promotion> availablePromotions = promotionRepository.findPromotionsValidAtDate(facture.getDate());
         // on regarde si il y a des promotions exclusives, dans ce cas on ne garde que celles-là
         List<Promotion> exclusivePromotions = availablePromotions
@@ -71,7 +72,6 @@ public class FactureController {
         if(exclusivePromotions.isEmpty()) {
             facture.getPromotions().addAll(availablePromotions);
         } else {
-            facture.calculate(vistamboire);
             Promotion bestPromotion = null;
             BigDecimal bestPromotionAmount = BigDecimal.ZERO;
             for(Promotion promotion: exclusivePromotions) {
