@@ -71,40 +71,40 @@ public class FactureControllerTest {
         Mockito.when(factureRepository.save(Mockito.any())).thenAnswer(invocationOnMock -> invocationOnMock.getArguments()[0]);
     }
 
-//    @Test
-//    public void given_secteur_geo_autre_date_1_when_create_facture_should_have_no_promotion() {
-//        // Given
-//        Mockito.when(promotionRepository.findPromotionsValidAtDate(DATE_1)).thenReturn(Collections.emptyList());
-//        Mockito.when(prixUnitCalculateur.calculatePrixUnit(Mockito.any(), Mockito.any())).thenAnswer(invocationOnMock -> ((Vistamboire)invocationOnMock.getArguments()[0]).getPrixUnitaireHT());
-//        Mockito.when(prixUnitCalculateur.calculateRemiseClient(Mockito.any(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(BigDecimal.ZERO);
-//        // When
-//        Facture actual = controller.createFacture(21l,1);
-//        // Then
-//        SoftAssertions softAssertions = new SoftAssertions();
-//        softAssertions.assertThat(actual.getRemiseClient()).isEqualTo(BigDecimal.ZERO);
-//        softAssertions.assertThat(actual.getPromotions()).isEmpty();
-//        softAssertions.assertThat(actual.getTotalHT()).isEqualTo(BigDecimal.TEN);
-//        softAssertions.assertThat(actual.getTotalTVA()).isEqualTo(BigDecimal.valueOf(2.0));
-//        softAssertions.assertThat(actual.getTotalTTC()).isEqualTo(BigDecimal.valueOf(12.0));
-//        softAssertions.assertAll();
-//    }
+    @Test
+    public void given_secteur_geo_autre_date_1_when_create_facture_should_have_no_promotion() {
+        // Given
+        Mockito.when(promotionRepository.findPromotionsValidAtDate(DATE_1)).thenReturn(Collections.emptyList());
+        Mockito.when(prixUnitCalculateur.calculatePrixUnit(Mockito.any(), Mockito.any())).thenAnswer(invocationOnMock -> ((Vistamboire)invocationOnMock.getArguments()[0]).getPrixUnitaireHT());
+        Mockito.when(prixUnitCalculateur.calculateRemiseClient(Mockito.any(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(BigDecimal.ZERO);
+        // When
+        Facture actual = controller.createFacture(21l,1);
+        // Then
+        SoftAssertions softAssertions = new SoftAssertions();
+        softAssertions.assertThat(actual.getRemiseClient()).isEqualTo(BigDecimal.ZERO);
+        softAssertions.assertThat(actual.getPromotions()).isEmpty();
+        softAssertions.assertThat(actual.getTotalHT()).isEqualTo(BigDecimal.TEN);
+        softAssertions.assertThat(actual.getTotalTVA()).isEqualTo(BigDecimal.valueOf(2.0));
+        softAssertions.assertThat(actual.getTotalTTC()).isEqualTo(BigDecimal.valueOf(12.0));
+        softAssertions.assertAll();
+    }
 
-//    @Test
-//    public void given_secteur_geo_autre_date_2_when_create_facture_should_have_one_promotion_10_percent() {
-//        // Given
-//        Mockito.when(promotionRepository.findPromotionsValidAtDate(Mockito.any())).thenReturn(Arrays.asList(
-//                createPromotionAround(DATE_2, true)
-//        ));
-//        Mockito.when(prixUnitCalculateur.calculatePrixUnit(Mockito.any(), Mockito.any())).thenAnswer(invocationOnMock -> ((Vistamboire)invocationOnMock.getArguments()[0]).getPrixUnitaireHT());
-//        Mockito.when(prixUnitCalculateur.calculateRemiseClient(Mockito.any(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(BigDecimal.ZERO);
-//        // When
-//        Facture actual = controller.createFacture(21l,1);
-//        // Then
-//        SoftAssertions softAssertions = new SoftAssertions();
-//        softAssertions.assertThat(actual.getPromotions().size()).isEqualTo(1);
-//        softAssertions.assertThat(actual.getTotalHT()).isEqualTo(BigDecimal.valueOf(9.0));
-//        softAssertions.assertAll();
-//    }
+    @Test
+    public void given_secteur_geo_autre_date_2_when_create_facture_should_have_one_promotion_10_percent() {
+        // Given
+        Mockito.when(promotionRepository.findPromotionsValidAtDate(Mockito.any())).thenReturn(Arrays.asList(
+                createPromotionAround(DATE_2, true)
+        ));
+        Mockito.when(prixUnitCalculateur.calculatePrixUnit(Mockito.any(), Mockito.any())).thenAnswer(invocationOnMock -> ((Vistamboire)invocationOnMock.getArguments()[0]).getPrixUnitaireHT());
+        Mockito.when(prixUnitCalculateur.calculateRemiseClient(Mockito.any(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(BigDecimal.ZERO);
+        // When
+        Facture actual = controller.createFacture(21l,1);
+        // Then
+        SoftAssertions softAssertions = new SoftAssertions();
+        softAssertions.assertThat(actual.getPromotions().size()).isEqualTo(1);
+        softAssertions.assertThat(actual.getTotalHT()).isEqualTo(BigDecimal.valueOf(9.0));
+        softAssertions.assertAll();
+    }
 
     private Promotion createPromotionAround(Calendar date, boolean exclusive) {
         Calendar dateDebut = (Calendar) date.clone();
