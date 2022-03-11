@@ -88,7 +88,8 @@ public class FactureController {
     }
 
     private BigDecimal calculateRemiseClientForFacture(Facture facture) {
-        return prixUnitCalculateur.calculateRemiseClient(facture.getClient(), databaseValuesExtractor.getQuantiteDejaCommandeeCetteAnnee(facture.getClient().getId(), facture.getDate()), facture.getQte());
+        int quantiteDejaCommandeeCetteAnnee = databaseValuesExtractor.getQuantiteDejaCommandeeCetteAnnee(facture.getClient().getId(), facture.getDate());
+        return prixUnitCalculateur.calculateRemiseClient(facture.getClient(), quantiteDejaCommandeeCetteAnnee, facture.getQte());
     }
 
     private Vistamboire getVistamboireForFacture(Facture facture) {
