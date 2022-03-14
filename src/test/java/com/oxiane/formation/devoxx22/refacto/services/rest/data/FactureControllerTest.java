@@ -4,6 +4,8 @@ import com.oxiane.formation.devoxx22.refacto.helpers.FacturePrinter;
 import com.oxiane.formation.devoxx22.refacto.helpers.PrixUnitCalculateur;
 import com.oxiane.formation.devoxx22.refacto.helpers.impl.FacturePrinterImpl;
 import com.oxiane.formation.devoxx22.refacto.model.*;
+import com.oxiane.formation.devoxx22.refacto.services.business.FactureBusiness;
+import com.oxiane.formation.devoxx22.refacto.services.business.impl.FactureBusinessImpl;
 import com.oxiane.formation.devoxx22.refacto.services.jdbc.DatabaseValuesExtractor;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.*;
 import org.assertj.core.api.Assertions;
@@ -71,6 +73,8 @@ public class FactureControllerTest {
         public PrixUnitCalculateur prixUnitCalculateur() { return Mockito.mock(PrixUnitCalculateur.class); }
         @Bean
         public PromotionRepository promotionRepository() { return Mockito.mock(PromotionRepository.class); }
+        @Bean
+        public FactureBusiness factureBusiness() { return new FactureBusinessImpl(); }
     }
 
     @Autowired

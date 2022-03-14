@@ -6,6 +6,7 @@ import com.oxiane.formation.devoxx22.refacto.model.Client;
 import com.oxiane.formation.devoxx22.refacto.model.Facture;
 import com.oxiane.formation.devoxx22.refacto.model.Promotion;
 import com.oxiane.formation.devoxx22.refacto.model.Vistamboire;
+import com.oxiane.formation.devoxx22.refacto.services.business.FactureBusiness;
 import com.oxiane.formation.devoxx22.refacto.services.jdbc.DatabaseValuesExtractor;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.ClientRepository;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.FactureRepository;
@@ -52,6 +53,9 @@ public class FactureController {
 
     @Autowired
     PromotionRepository promotionRepository;
+
+    @Autowired
+    FactureBusiness factureBusiness;
 
     private Logger LOGGER = LoggerFactory.getLogger(FactureController.class);
 

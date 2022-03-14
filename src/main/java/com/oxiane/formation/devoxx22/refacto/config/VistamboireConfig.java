@@ -5,6 +5,8 @@ import com.oxiane.formation.devoxx22.refacto.helpers.PrixUnitCalculateur;
 import com.oxiane.formation.devoxx22.refacto.helpers.VerboseDateFormat;
 import com.oxiane.formation.devoxx22.refacto.helpers.impl.FacturePrinterImpl;
 import com.oxiane.formation.devoxx22.refacto.helpers.impl.PrixUnitCalculateurImpl;
+import com.oxiane.formation.devoxx22.refacto.services.business.FactureBusiness;
+import com.oxiane.formation.devoxx22.refacto.services.business.impl.FactureBusinessImpl;
 import com.oxiane.formation.devoxx22.refacto.services.jdbc.DatabaseValuesExtractor;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.spi.DatabaseValuesExtractorImpl;
 import org.springframework.context.annotation.Bean;
@@ -25,4 +27,6 @@ public class VistamboireConfig {
     @Bean
     public VerboseDateFormat apiDateFormatter() { return new VerboseDateFormat("yyyy-MM-dd"); }
 
+    @Bean
+    public FactureBusiness factureBusiness() { return new FactureBusinessImpl(); }
 }
