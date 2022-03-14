@@ -6,6 +6,7 @@ import com.oxiane.formation.devoxx22.refacto.helpers.impl.FacturePrinterImpl;
 import com.oxiane.formation.devoxx22.refacto.model.*;
 import com.oxiane.formation.devoxx22.refacto.services.jdbc.DatabaseValuesExtractor;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.*;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,9 +18,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.*;
+
+import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringJUnitConfig
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -32,6 +37,8 @@ public class FactureControllerTest {
     private static final Client CLIENT_LH = new Client(20l, "Marchand", "Christophe", ADRESSE_LH);
     private static final Client CLIENT_PARIS = new Client(21l, "Martin", "Sophie", ADRESSE_PARIS);
     private static final Client CLIENT_PROFESSIONNEL = new Client(22l, "Martin", "Sophie", Client.TYPE_PROFESSIONNEL, ADRESSE_PARIS);
+    private static final Vistamboire VISTAMBOIRE = new Vistamboire(BigDecimal.TEN, BigDecimal.valueOf(0.2), BigDecimal.ONE, new GregorianCalendar(0001, 0, 1), new GregorianCalendar(3000, 12, 31));
+    private static final Facture FACTURE = new Facture(1l,CLIENT_PARIS, new GregorianCalendar(), BigDecimal.TEN, BigDecimal.ZERO, BigDecimal.TEN);
 
     private Calendar DATE_1 = new GregorianCalendar(1972,10,21);
     private Calendar DATE_2 = new GregorianCalendar(1994,07,24);
@@ -52,6 +59,8 @@ public class FactureControllerTest {
     VistamboireRepository vistamboireRepository;
     @Autowired
     PrixUnitCalculateur prixUnitCalculateur;
+    @MockBean
+    FacturePrinter facturePrinter;
     @Configuration
     static class Config {
         @Bean
@@ -199,6 +208,28 @@ public class FactureControllerTest {
         softAssertions.assertThat(actual.getPromotions().get(0)).isEqualTo(promotions.get(1));
         softAssertions.assertAll();
     }
+    @Test
+    public void when_getFactures_repository_getFactures_should_be_call_once() {
+        Mockito.when(factureRepository.findAll()).thenReturn(Collections.emptyList());
+        controller.getFactures();
+        Mockito.verify(factureRepository, Mockito.times(1)).findAll();
+    }
+    @Test
+    public void when_getFacture_repository_getFacture_should_be_call_once() {
+        Mockito.when(factureRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(null));
+        Throwable thrown = catchThrowable(() -> controller.getFacture(1l));
+        Assertions.assertThat(thrown).isInstanceOf(ResponseStatusException.class);
+        Mockito.verify(factureRepository, Mockito.times(1)).findById(1l);
+    }
+    @Test
+    public void when_print_facture_printer_print_should_be_call() {
+        Mockito.when(factureRepository.findById(1l)).thenReturn(Optional.of(FACTURE));
+        Mockito.when(vistamboireRepository.findByValidAtDate(Mockito.any())).thenReturn(VISTAMBOIRE);
+        Mockito.when(facturePrinter.printFacture(FACTURE, VISTAMBOIRE)).thenReturn("facture");
+        controller.printFacture(1l);
+        Mockito.verify(facturePrinter, Mockito.times(1)).printFacture(FACTURE, VISTAMBOIRE);
+    }
+
     private Promotion createPromotionPercentAround(Calendar date, boolean exclusive) {
         return createPromotionPercentAround(date, 0.1, exclusive);
     }
