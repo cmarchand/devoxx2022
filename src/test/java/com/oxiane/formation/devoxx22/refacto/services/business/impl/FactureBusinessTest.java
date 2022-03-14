@@ -1,4 +1,4 @@
-package com.oxiane.formation.devoxx22.refacto.services.rest.data;
+package com.oxiane.formation.devoxx22.refacto.services.business.impl;
 
 import com.oxiane.formation.devoxx22.refacto.helpers.FacturePrinter;
 import com.oxiane.formation.devoxx22.refacto.helpers.PrixUnitCalculateur;
@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringJUnitConfig
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class FactureControllerTest {
+public class FactureBusinessTest {
 
     private static final SecteurGeographique SECTEUR_GEO_MARITIME = new SecteurGeographique(SecteurGeographique.NOM_MARITIME, BigDecimal.valueOf(2.0));
     private static final SecteurGeographique SECTEUR_GEO_AUTRE = new SecteurGeographique(SecteurGeographique.NOM_AUTRE, BigDecimal.ONE);
@@ -66,8 +66,6 @@ public class FactureControllerTest {
     @Configuration
     static class Config {
         @Bean
-        public FactureController factureController() { return new FactureController(); }
-        @Bean
         public FacturePrinter facturePrinter() { return new FacturePrinterImpl(); }
         @Bean
         public PrixUnitCalculateur prixUnitCalculateur() { return Mockito.mock(PrixUnitCalculateur.class); }
@@ -78,7 +76,7 @@ public class FactureControllerTest {
     }
 
     @Autowired
-    FactureController controller;
+    FactureBusiness factureBusiness;
 
     @BeforeEach
     public void beforeEach() {
@@ -105,7 +103,7 @@ public class FactureControllerTest {
                 );
         Mockito.when(prixUnitCalculateur.calculateRemiseClient(Mockito.any(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(BigDecimal.ZERO);
         // When
-        Facture actual = controller.createFacture(21l,1);
+        Facture actual = factureBusiness.createAndSaveFacture(21l,1);
         // Then
         SoftAssertions softAssertions = new SoftAssertions();
         softAssertions.assertThat(actual.getClient()).isEqualTo(CLIENT_PARIS);
@@ -129,7 +127,7 @@ public class FactureControllerTest {
                 );
         Mockito.when(prixUnitCalculateur.calculateRemiseClient(Mockito.any(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(BigDecimal.valueOf(0.5));
         // When
-        Facture actual = controller.createFacture(21l,1);
+        Facture actual = factureBusiness.createAndSaveFacture(21l,1);
         // Then
         SoftAssertions softAssertions = new SoftAssertions();
         softAssertions.assertThat(actual.getClient()).isEqualTo(CLIENT_PARIS);
@@ -151,7 +149,7 @@ public class FactureControllerTest {
         Mockito.when(prixUnitCalculateur.calculatePrixUnit(currentVistamboire, CLIENT_PROFESSIONNEL)).thenAnswer(invocationOnMock -> ((Vistamboire)invocationOnMock.getArguments()[0]).getPrixUnitaireHT().multiply(BigDecimal.valueOf(0.7)));
         Mockito.when(prixUnitCalculateur.calculateRemiseClient(CLIENT_PROFESSIONNEL, 0, 1)).thenReturn(BigDecimal.ZERO);
         // When
-        Facture actual = controller.createFacture(22l,1);
+        Facture actual = factureBusiness.createAndSaveFacture(22l,1);
         // Then
         SoftAssertions softAssertions = new SoftAssertions();
         softAssertions.assertThat(actual.getPromotions().size()).isEqualTo(0);
@@ -167,7 +165,7 @@ public class FactureControllerTest {
         Mockito.when(prixUnitCalculateur.calculatePrixUnit(Mockito.any(), Mockito.any())).thenAnswer(invocationOnMock -> ((Vistamboire)invocationOnMock.getArguments()[0]).getPrixUnitaireHT());
         Mockito.when(prixUnitCalculateur.calculateRemiseClient(Mockito.any(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(BigDecimal.ZERO);
         // When
-        Facture actual = controller.createFacture(21l,1);
+        Facture actual = factureBusiness.createAndSaveFacture(21l,1);
         // Then
         SoftAssertions softAssertions = new SoftAssertions();
         softAssertions.assertThat(actual.getPromotions().size()).isEqualTo(1);
@@ -183,7 +181,7 @@ public class FactureControllerTest {
         Mockito.when(prixUnitCalculateur.calculatePrixUnit(Mockito.any(), Mockito.any())).thenAnswer(invocationOnMock -> ((Vistamboire)invocationOnMock.getArguments()[0]).getPrixUnitaireHT());
         Mockito.when(prixUnitCalculateur.calculateRemiseClient(Mockito.any(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(BigDecimal.ZERO);
         // When
-        Facture actual = controller.createFacture(21l,1);
+        Facture actual = factureBusiness.createAndSaveFacture(21l,1);
         // Then
         SoftAssertions softAssertions = new SoftAssertions();
         softAssertions.assertThat(actual.getPromotions().size()).isEqualTo(1);
@@ -204,7 +202,7 @@ public class FactureControllerTest {
         Mockito.when(prixUnitCalculateur.calculatePrixUnit(Mockito.any(), Mockito.any())).thenAnswer(invocationOnMock -> ((Vistamboire)invocationOnMock.getArguments()[0]).getPrixUnitaireHT());
         Mockito.when(prixUnitCalculateur.calculateRemiseClient(Mockito.any(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(BigDecimal.ZERO);
         // When
-        Facture actual = controller.createFacture(21l,4);
+        Facture actual = factureBusiness.createAndSaveFacture(21l,4);
         // Then
         SoftAssertions softAssertions = new SoftAssertions();
         softAssertions.assertThat(actual.getPromotions().size()).isEqualTo(1);
@@ -215,13 +213,13 @@ public class FactureControllerTest {
     @Test
     public void when_getFactures_repository_getFactures_should_be_call_once() {
         Mockito.when(factureRepository.findAll()).thenReturn(Collections.emptyList());
-        controller.getFactures();
+        factureBusiness.getFactures();
         Mockito.verify(factureRepository, Mockito.times(1)).findAll();
     }
     @Test
     public void when_getFacture_repository_getFacture_should_be_call_once() {
         Mockito.when(factureRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(null));
-        Throwable thrown = catchThrowable(() -> controller.getFacture(1l));
+        Throwable thrown = catchThrowable(() -> factureBusiness.getFacture(1l));
         Assertions.assertThat(thrown).isInstanceOf(ResponseStatusException.class);
         Mockito.verify(factureRepository, Mockito.times(1)).findById(1l);
     }
@@ -230,7 +228,7 @@ public class FactureControllerTest {
         Mockito.when(factureRepository.findById(1l)).thenReturn(Optional.of(FACTURE));
         Mockito.when(vistamboireRepository.findByValidAtDate(Mockito.any())).thenReturn(VISTAMBOIRE);
         Mockito.when(facturePrinter.printFacture(FACTURE, VISTAMBOIRE)).thenReturn("facture");
-        controller.printFacture(1l);
+        factureBusiness.printFacture(1l);
         Mockito.verify(facturePrinter, Mockito.times(1)).printFacture(FACTURE, VISTAMBOIRE);
     }
 

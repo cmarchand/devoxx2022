@@ -1,31 +1,13 @@
 package com.oxiane.formation.devoxx22.refacto.services.rest.data;
 
-import com.oxiane.formation.devoxx22.refacto.helpers.FacturePrinter;
-import com.oxiane.formation.devoxx22.refacto.helpers.PrixUnitCalculateur;
-import com.oxiane.formation.devoxx22.refacto.model.Client;
 import com.oxiane.formation.devoxx22.refacto.model.Facture;
-import com.oxiane.formation.devoxx22.refacto.model.Promotion;
-import com.oxiane.formation.devoxx22.refacto.model.Vistamboire;
 import com.oxiane.formation.devoxx22.refacto.services.business.FactureBusiness;
-import com.oxiane.formation.devoxx22.refacto.services.jdbc.DatabaseValuesExtractor;
-import com.oxiane.formation.devoxx22.refacto.services.jpa.ClientRepository;
-import com.oxiane.formation.devoxx22.refacto.services.jpa.FactureRepository;
-import com.oxiane.formation.devoxx22.refacto.services.jpa.PromotionRepository;
-import com.oxiane.formation.devoxx22.refacto.services.jpa.VistamboireRepository;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.GregorianCalendar;
-import java.util.List;
-
 
 @RestController
 @RequestMapping("/api/factures")
@@ -33,26 +15,6 @@ import java.util.List;
 public class FactureController {
     private static final String CR = System.getProperty("line.separator");
     private static final String TAB = "\t";
-    @Autowired
-    FactureRepository repository;
-
-    @Autowired
-    ClientRepository clientRepository;
-
-    @Autowired
-    VistamboireRepository vistamboireRepository;
-
-    @Autowired
-    FacturePrinter printer;
-
-    @Autowired
-    DatabaseValuesExtractor databaseValuesExtractor;
-
-    @Autowired
-    PrixUnitCalculateur prixUnitCalculateur;
-
-    @Autowired
-    PromotionRepository promotionRepository;
 
     @Autowired
     FactureBusiness factureBusiness;
@@ -63,101 +25,21 @@ public class FactureController {
     public Facture createFacture(
             @RequestParam Long clientId,
             @RequestParam(required = false, defaultValue = "1") int qte) {
-        return createAndSaveFacture(clientId, qte);
+        return factureBusiness.createAndSaveFacture(clientId, qte);
     }
 
     @GetMapping("/{id}")
     public Facture getFacture(@PathVariable Long id) {
-        LOGGER.info("getFacture({})", id);
-        return repository
-                .findById(id)
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Facture inconnue: " + id)
-                );
+        return factureBusiness.getFacture(id);
     }
 
     @GetMapping("/")
     public Iterable<Facture> getFactures() {
-        LOGGER.info("getFactures()");
-        return repository.findAll();
+        return factureBusiness.getFactures();
     }
 
     @GetMapping(value = "/{id}/print", produces = MediaType.TEXT_PLAIN_VALUE)
     public String printFacture(@PathVariable Long id) {
-        LOGGER.info("printFacture({})", id);
-        Facture facture = getFacture(id);
-        Vistamboire vistamboire = vistamboireRepository.findByValidAtDate(facture.getDate());
-        return printer.printFacture(facture, vistamboire);
-    }
-
-    private Facture createAndSaveFacture(Long clientId, int qte) {
-        Client client = findClientById(clientId);
-        Facture facture = new Facture(client, getCurrentDate(), qte);
-        Vistamboire vistamboire = getVistamboireForFacture(facture);
-        facture.setRemiseClient(calculateRemiseClientForFacture(facture));
-        facture.calculate(vistamboire);
-        applyPromotionsToFacture(facture);
-        facture.calculate(vistamboire);
-        return repository.save(facture);
-    }
-
-    private GregorianCalendar getCurrentDate() {
-        return new GregorianCalendar();
-    }
-
-    private void applyPromotionsToFacture(Facture facture) {
-        List<Promotion> availablePromotions = promotionRepository.findPromotionsValidAtDate(facture.getDate());
-        if(thereIsNoExclusivePromotionIn(availablePromotions)) {
-            facture.getPromotions().addAll(availablePromotions);
-        } else {
-            Promotion bestPromotion = getBestExclusivePromotionForFacture(facture, availablePromotions);
-            facture.getPromotions().add(bestPromotion);
-        }
-    }
-
-    private Promotion getBestExclusivePromotionForFacture(Facture facture, List<Promotion> availablePromotions) {
-        record PromotionCalculee(Promotion promotion, BigDecimal montant) {};
-        return availablePromotions.stream()
-                .filter(Promotion::isExclusive)
-                .map(promotion -> new PromotionCalculee(promotion, getRemiseAmountOfPromotionAppliedTo(promotion, facture)))
-                .max((pc1, pc2) -> pc1.montant.subtract(pc2.montant).signum())
-                .get()
-                .promotion;
-    }
-
-    private boolean thereIsNoExclusivePromotionIn(List<Promotion> availablePromotions) {
-        return availablePromotions
-                .stream()
-                .noneMatch(Promotion::isExclusive);
-    }
-
-    private BigDecimal calculateRemiseClientForFacture(Facture facture) {
-        int quantiteDejaCommandeeCetteAnnee = databaseValuesExtractor.getQuantiteDejaCommandeeCetteAnnee(
-                facture.getClient().getId(),
-                facture.getDate());
-        return prixUnitCalculateur.calculateRemiseClient(
-                facture.getClient(),
-                quantiteDejaCommandeeCetteAnnee,
-                facture.getQte());
-    }
-
-    private Vistamboire getVistamboireForFacture(Facture facture) {
-        Vistamboire vistamboire = vistamboireRepository.findByValidAtDate(facture.getDate());
-        vistamboire.setPrixUnitaireHT(prixUnitCalculateur.calculatePrixUnit(vistamboire, facture.getClient()));
-        return vistamboire;
-    }
-
-    private Client findClientById(Long clientId) {
-        return clientRepository
-                .findById(clientId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client inconnu: " + clientId));
-    }
-
-    private BigDecimal getRemiseAmountOfPromotionAppliedTo(Promotion promotion, Facture facture) {
-        if(promotion.getMontantRemise()!=null) {
-            return promotion.getMontantRemise();
-        } else {
-            return facture.getTotalHT().multiply(promotion.getPourcentageRemise());
-        }
+        return factureBusiness.printFacture(id);
     }
 }
