@@ -219,9 +219,9 @@ public class FactureBusinessTest {
     @Test
     public void when_getFacture_repository_getFacture_should_be_call_once() {
         Mockito.when(factureRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(null));
-        Throwable thrown = catchThrowable(() -> factureBusiness.getFacture(1l));
-        Assertions.assertThat(thrown).isInstanceOf(ResponseStatusException.class);
+        Optional<Facture> actual = factureBusiness.getFacture(1l);
         Mockito.verify(factureRepository, Mockito.times(1)).findById(1l);
+        Assertions.assertThat(actual).isEmpty();
     }
     @Test
     public void when_print_facture_printer_print_should_be_call() {

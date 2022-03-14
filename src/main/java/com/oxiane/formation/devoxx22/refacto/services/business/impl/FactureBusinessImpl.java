@@ -13,12 +13,11 @@ import com.oxiane.formation.devoxx22.refacto.services.jpa.FactureRepository;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.PromotionRepository;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.VistamboireRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Optional;
 
 public class FactureBusinessImpl implements FactureBusiness {
     @Autowired
@@ -55,12 +54,9 @@ public class FactureBusinessImpl implements FactureBusiness {
     }
 
     @Override
-    public Facture getFacture(Long id) {
+    public Optional<Facture> getFacture(Long id) {
         return repository
-                .findById(id)
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Facture inconnue: " + id)
-                );
+                .findById(id);
     }
 
     @Override
@@ -70,15 +66,15 @@ public class FactureBusinessImpl implements FactureBusiness {
 
     @Override
     public String printFacture(Long id) {
-        Facture facture = getFacture(id);
+        Facture facture = getFacture(id).orElseThrow();
         Vistamboire vistamboire = vistamboireRepository.findByValidAtDate(facture.getDate());
         return printer.printFacture(facture, vistamboire);
     }
 
-        private Client findClientById(Long clientId) {
+    private Client findClientById(Long clientId) {
         return clientRepository
                 .findById(clientId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client inconnu: " + clientId));
+                .orElseThrow();
     }
 
 
