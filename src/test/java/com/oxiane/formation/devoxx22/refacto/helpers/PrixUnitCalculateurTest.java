@@ -1,22 +1,28 @@
 package com.oxiane.formation.devoxx22.refacto.helpers;
 
-import com.oxiane.formation.devoxx22.refacto.config.VistamboireTestConfig;
+import com.oxiane.formation.devoxx22.refacto.helpers.impl.PrixUnitCalculateurImpl;
 import com.oxiane.formation.devoxx22.refacto.model.Adresse;
 import com.oxiane.formation.devoxx22.refacto.model.Client;
 import com.oxiane.formation.devoxx22.refacto.model.Vistamboire;
+import com.oxiane.formation.devoxx22.refacto.services.jdbc.DatabaseValuesExtractor;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.data.Percentage;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.math.BigDecimal;
 
-@SpringJUnitConfig(
-        classes = {
-                VistamboireTestConfig.class,
-        }
-)
+import static com.oxiane.formation.devoxx22.refacto.config.TestData.SECTEUR_GEO_MARITIME;
+import static com.oxiane.formation.devoxx22.refacto.config.TestData.SECTEUR_GEO_TERRE;
+
+
+@SpringJUnitConfig
 public class PrixUnitCalculateurTest {
     private Vistamboire vistamboire = new Vistamboire(
             BigDecimal.TEN,
@@ -26,6 +32,30 @@ public class PrixUnitCalculateurTest {
             null
     );
     private static final Percentage LIMITE = Percentage.withPercentage(0.001);
+    @MockBean
+    private DatabaseValuesExtractor databaseValuesExtractor;
+
+    @BeforeEach
+    public void beforeEach() {
+        Mockito.when(
+                databaseValuesExtractor.getQuantiteDejaCommandeeCetteAnnee(
+                        Mockito.anyLong(),
+                        Mockito.any())
+        ).thenReturn(0);
+        Mockito.when(
+                databaseValuesExtractor.getSecteurGeographiqueByDepartement("75")
+        ).thenReturn(SECTEUR_GEO_TERRE);
+        Mockito.when(
+                databaseValuesExtractor.getSecteurGeographiqueByDepartement("76")
+        ).thenReturn(SECTEUR_GEO_MARITIME);
+    }
+    @Configuration
+    static class Config {
+        @Bean
+        public PrixUnitCalculateur calculateur() {
+            return new PrixUnitCalculateurImpl();
+        }
+    }
     @Autowired
     private PrixUnitCalculateur calculateur;
 

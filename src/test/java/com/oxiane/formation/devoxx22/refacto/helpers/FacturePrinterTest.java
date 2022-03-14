@@ -1,32 +1,59 @@
 package com.oxiane.formation.devoxx22.refacto.helpers;
 
-import com.oxiane.formation.devoxx22.refacto.config.VistamboireTestConfig;
 import com.oxiane.formation.devoxx22.refacto.helpers.impl.FacturePrinterImpl;
 import com.oxiane.formation.devoxx22.refacto.model.Adresse;
 import com.oxiane.formation.devoxx22.refacto.model.Client;
 import com.oxiane.formation.devoxx22.refacto.model.Facture;
 import com.oxiane.formation.devoxx22.refacto.model.Vistamboire;
+import com.oxiane.formation.devoxx22.refacto.services.jdbc.DatabaseValuesExtractor;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-@SpringJUnitConfig(
-        classes = {VistamboireTestConfig.class}
-)
+import static com.oxiane.formation.devoxx22.refacto.config.TestData.SECTEUR_GEO_MARITIME;
+import static com.oxiane.formation.devoxx22.refacto.config.TestData.SECTEUR_GEO_TERRE;
+
+@SpringJUnitConfig
 public class FacturePrinterTest {
     // Warning : Monthes are 0-based !!!
     private static final Calendar FIXED_DATE= new GregorianCalendar(2022, 0, 31);
     private static final Calendar LOWER_BOUND = new GregorianCalendar(2022, 0, 1);
     private static final Calendar UPPER_BOUND = new GregorianCalendar(2022, 5, 1);
 
-    @Autowired
-    private FacturePrinterImpl printer;
+    @MockBean
+    private DatabaseValuesExtractor databaseValuesExtractor;
 
+    @BeforeEach
+    public void beforeEach() {
+        Mockito.when(
+                databaseValuesExtractor.getQuantiteDejaCommandeeCetteAnnee(
+                        Mockito.anyLong(),
+                        Mockito.any())
+        ).thenReturn(0);
+        Mockito.when(
+                databaseValuesExtractor.getSecteurGeographiqueByDepartement("75")
+        ).thenReturn(SECTEUR_GEO_TERRE);
+        Mockito.when(
+                databaseValuesExtractor.getSecteurGeographiqueByDepartement("76")
+        ).thenReturn(SECTEUR_GEO_MARITIME);
+    }
+    @Configuration
+    static class Config {
+        @Bean
+        public FacturePrinter printer() { return new FacturePrinterImpl(); }
+    }
+    @Autowired
+    private FacturePrinter printer;
 
     @Test
     public void given_facture_with_qte_1_and_vistamboire_print_output_shouldbe_full() {
