@@ -93,7 +93,7 @@ public class FactureControllerTest {
     public void given_secteur_geo_autre_date_2_when_create_facture_should_have_one_promotion_10_percent() {
         // Given
         Mockito.when(promotionRepository.findPromotionsValidAtDate(Mockito.any())).thenReturn(Arrays.asList(
-                createPromotionAround(DATE_2, true)
+                createPromotionPercentAround(DATE_2, true)
         ));
         Mockito.when(prixUnitCalculateur.calculatePrixUnit(Mockito.any(), Mockito.any())).thenAnswer(invocationOnMock -> ((Vistamboire)invocationOnMock.getArguments()[0]).getPrixUnitaireHT());
         Mockito.when(prixUnitCalculateur.calculateRemiseClient(Mockito.any(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(BigDecimal.ZERO);
@@ -105,8 +105,25 @@ public class FactureControllerTest {
         softAssertions.assertThat(actual.getTotalHT()).isEqualTo(BigDecimal.valueOf(9.0));
         softAssertions.assertAll();
     }
+    @Test
+    public void given_secteur_geo_autre_date_2_when_create_facture_should_have_one_promotion_3_euros() {
+        // Given
+        Mockito.when(promotionRepository.findPromotionsValidAtDate(Mockito.any())).thenReturn(Arrays.asList(
+                createPromotionAmountAround(DATE_2, true)
+        ));
+        Mockito.when(prixUnitCalculateur.calculatePrixUnit(Mockito.any(), Mockito.any())).thenAnswer(invocationOnMock -> ((Vistamboire)invocationOnMock.getArguments()[0]).getPrixUnitaireHT());
+        Mockito.when(prixUnitCalculateur.calculateRemiseClient(Mockito.any(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(BigDecimal.ZERO);
+        // When
+        Facture actual = controller.createFacture(21l,1);
+        // Then
+        SoftAssertions softAssertions = new SoftAssertions();
+        softAssertions.assertThat(actual.getPromotions().size()).isEqualTo(1);
+        softAssertions.assertThat(actual.getPromotions().get(0).getMontantRemise()).isEqualTo(BigDecimal.valueOf(3.0));
+        softAssertions.assertThat(actual.getTotalHT()).isEqualTo(BigDecimal.valueOf(7.0));
+        softAssertions.assertAll();
+    }
 
-    private Promotion createPromotionAround(Calendar date, boolean exclusive) {
+    private Promotion createPromotionPercentAround(Calendar date, boolean exclusive) {
         Calendar dateDebut = (Calendar) date.clone();
         dateDebut.set(Calendar.MONTH, dateDebut.get(Calendar.MONTH)-1);
         Calendar dateFin = (Calendar) date.clone();
@@ -118,6 +135,20 @@ public class FactureControllerTest {
                 "Promotion surprise",
                 null,
                 BigDecimal.valueOf(0.1),
+                exclusive);
+    }
+    private Promotion createPromotionAmountAround(Calendar date, boolean exclusive) {
+        Calendar dateDebut = (Calendar) date.clone();
+        dateDebut.set(Calendar.MONTH, dateDebut.get(Calendar.MONTH)-1);
+        Calendar dateFin = (Calendar) date.clone();
+        dateFin.set(Calendar.MONTH, dateFin.get(Calendar.MONTH)+1);
+        return new Promotion(
+                1l,
+                dateDebut,
+                dateFin,
+                "Promotion surprise",
+                BigDecimal.valueOf(3.0),
+                null,
                 exclusive);
     }
 }
