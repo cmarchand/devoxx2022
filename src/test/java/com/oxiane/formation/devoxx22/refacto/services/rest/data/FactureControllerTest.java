@@ -7,6 +7,7 @@ import com.oxiane.formation.devoxx22.refacto.model.*;
 import com.oxiane.formation.devoxx22.refacto.services.jdbc.DatabaseValuesExtractor;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.*;
 import org.assertj.core.api.SoftAssertions;
+import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -99,6 +100,31 @@ public class FactureControllerTest {
         softAssertions.assertThat(actual.getTotalHT()).isEqualTo(BigDecimal.TEN);
         softAssertions.assertThat(actual.getTotalTVA()).isEqualTo(BigDecimal.valueOf(2.0));
         softAssertions.assertThat(actual.getTotalTTC()).isEqualTo(BigDecimal.valueOf(12.0));
+        softAssertions.assertAll();
+    }
+    @Test
+    @DirtiesContext
+    public void given_secteur_geo_autre_date_1_qte_50_when_create_facture_should_have_remise_client() {
+        // Given
+        Mockito.when(promotionRepository.findPromotionsValidAtDate(DATE_1)).thenReturn(Collections.emptyList());
+        Mockito
+                .when(prixUnitCalculateur.calculatePrixUnit(Mockito.any(), Mockito.any()))
+                .thenAnswer(
+                        invocationOnMock -> ((Vistamboire)invocationOnMock.getArguments()[0]).getPrixUnitaireHT()
+                );
+        Mockito.when(prixUnitCalculateur.calculateRemiseClient(Mockito.any(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(BigDecimal.valueOf(0.5));
+        // When
+        Facture actual = controller.createFacture(21l,1);
+        // Then
+        SoftAssertions softAssertions = new SoftAssertions();
+        softAssertions.assertThat(actual.getClient()).isEqualTo(CLIENT_PARIS);
+        softAssertions.assertThat(actual.getClient().getType()).isEqualTo(Client.TYPE_PARTICULIER);
+        softAssertions.assertThat(actual.getRemiseClient()).isEqualTo(BigDecimal.valueOf(0.5));
+        softAssertions.assertThat(actual.getPromotions()).isEmpty();
+        Percentage percentage = Percentage.withPercentage(0.01);
+        softAssertions.assertThat(actual.getTotalHT()).isCloseTo(BigDecimal.valueOf(5.0), percentage);
+        softAssertions.assertThat(actual.getTotalTVA()).isCloseTo(BigDecimal.valueOf(1.0), percentage);
+        softAssertions.assertThat(actual.getTotalTTC()).isCloseTo(BigDecimal.valueOf(6.00), percentage);
         softAssertions.assertAll();
     }
     @Test
