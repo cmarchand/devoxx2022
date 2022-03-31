@@ -36,6 +36,8 @@ public class FactureControllerTest {
     private Calendar DATE_1 = new GregorianCalendar(1972,10,21);
     private Calendar DATE_2 = new GregorianCalendar(1994,07,24);
 
+    private static int promotionCounter = 0;
+
     @MockBean
     DatabaseValuesExtractor databaseValuesExtractor;
     @MockBean
@@ -176,8 +178,31 @@ public class FactureControllerTest {
         softAssertions.assertThat(actual.getTotalHT()).isEqualTo(BigDecimal.valueOf(7.0));
         softAssertions.assertAll();
     }
-
+    @Test
+    public void given_secteur_geo_autre_and_4_promotions_with_exclusive_facture_should_have_first_promotion_with_best_amount() {
+        // Given
+        List<Promotion> promotions = Arrays.asList(
+                createPromotionAmountAround(DATE_2, 1.0, true),
+                createPromotionAmountAround(DATE_2, 3.0, true),
+                createPromotionAmountAround(DATE_2, 2.0, true),
+                createPromotionAmountAround(DATE_2, 3.0, true)
+        );
+        Mockito.when(promotionRepository.findPromotionsValidAtDate(Mockito.any())).thenReturn(promotions);
+        Mockito.when(prixUnitCalculateur.calculatePrixUnit(Mockito.any(), Mockito.any())).thenAnswer(invocationOnMock -> ((Vistamboire)invocationOnMock.getArguments()[0]).getPrixUnitaireHT());
+        Mockito.when(prixUnitCalculateur.calculateRemiseClient(Mockito.any(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(BigDecimal.ZERO);
+        // When
+        Facture actual = controller.createFacture(21l,4);
+        // Then
+        SoftAssertions softAssertions = new SoftAssertions();
+        softAssertions.assertThat(actual.getPromotions().size()).isEqualTo(1);
+        softAssertions.assertThat(actual.getPromotions().get(0).getMontantRemise()).isEqualTo(BigDecimal.valueOf(3.0));
+        softAssertions.assertThat(actual.getPromotions().get(0)).isEqualTo(promotions.get(1));
+        softAssertions.assertAll();
+    }
     private Promotion createPromotionPercentAround(Calendar date, boolean exclusive) {
+        return createPromotionPercentAround(date, 0.1, exclusive);
+    }
+    private Promotion createPromotionPercentAround(Calendar date, double amount, boolean exclusive) {
         Calendar dateDebut = (Calendar) date.clone();
         dateDebut.set(Calendar.MONTH, dateDebut.get(Calendar.MONTH)-1);
         Calendar dateFin = (Calendar) date.clone();
@@ -188,10 +213,13 @@ public class FactureControllerTest {
                 dateFin,
                 "Promotion surprise",
                 null,
-                BigDecimal.valueOf(0.1),
+                BigDecimal.valueOf(amount),
                 exclusive);
     }
     private Promotion createPromotionAmountAround(Calendar date, boolean exclusive) {
+        return createPromotionAmountAround(date, 3.0, exclusive);
+    }
+    private Promotion createPromotionAmountAround(Calendar date, double percent, boolean exclusive) {
         Calendar dateDebut = (Calendar) date.clone();
         dateDebut.set(Calendar.MONTH, dateDebut.get(Calendar.MONTH)-1);
         Calendar dateFin = (Calendar) date.clone();
@@ -200,8 +228,8 @@ public class FactureControllerTest {
                 1l,
                 dateDebut,
                 dateFin,
-                "Promotion surprise",
-                BigDecimal.valueOf(3.0),
+                "Promotion surprise "+promotionCounter++,
+                BigDecimal.valueOf(percent),
                 null,
                 exclusive);
     }
