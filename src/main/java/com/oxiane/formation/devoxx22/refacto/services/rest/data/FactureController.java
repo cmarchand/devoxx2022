@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -80,18 +81,13 @@ public class FactureController {
     }
 
     private Promotion getBestExclusivePromotionForFacture(Facture facture, List<Promotion> availablePromotions) {
-        Promotion bestPromotion = null;
-        BigDecimal bestPromotionAmount = BigDecimal.ZERO;
-        for(Promotion promotion: availablePromotions) {
-            if(promotion.isExclusive()) {
-                BigDecimal currentPromotionAmount = getRemiseAmountOfPromotionAppliedTo(promotion, facture);
-                if (currentPromotionAmount.compareTo(bestPromotionAmount) > 0) {
-                    bestPromotion = promotion;
-                    bestPromotionAmount = currentPromotionAmount;
-                }
-            }
-        }
-        return bestPromotion;
+        record PromotionCalculee(Promotion promotion, BigDecimal montant) {};
+        return availablePromotions.stream()
+                .filter(Promotion::isExclusive)
+                .map(promotion -> new PromotionCalculee(promotion, getRemiseAmountOfPromotionAppliedTo(promotion, facture)))
+                .max((pc1, pc2) -> pc1.montant.subtract(pc2.montant).signum())
+                .get()
+                .promotion;
     }
 
     private boolean thereIsNoExclusivePromotionIn(List<Promotion> availablePromotions) {
