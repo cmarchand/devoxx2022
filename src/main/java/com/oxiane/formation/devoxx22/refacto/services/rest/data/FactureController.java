@@ -6,11 +6,11 @@ import com.oxiane.formation.devoxx22.refacto.model.Client;
 import com.oxiane.formation.devoxx22.refacto.model.Facture;
 import com.oxiane.formation.devoxx22.refacto.model.Promotion;
 import com.oxiane.formation.devoxx22.refacto.model.Vistamboire;
+import com.oxiane.formation.devoxx22.refacto.services.jdbc.DatabaseValuesExtractor;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.ClientRepository;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.FactureRepository;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.PromotionRepository;
 import com.oxiane.formation.devoxx22.refacto.services.jpa.VistamboireRepository;
-import com.oxiane.formation.devoxx22.refacto.services.jpa.spi.DatabaseValuesExtractorImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public class FactureController {
     FacturePrinter printer;
 
     @Autowired
-    DatabaseValuesExtractorImpl databaseValuesExtractor;
+    DatabaseValuesExtractor databaseValuesExtractor;
 
     @Autowired
     PrixUnitCalculateur prixUnitCalculateur;
