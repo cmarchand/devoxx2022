@@ -67,6 +67,9 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
     }
 
     private enum ClientType {
+        PARTICULIER(Client.TYPE_PARTICULIER, BigDecimal.ONE),
+        PROFESSIONNEL(Client.TYPE_PROFESSIONNEL, BigDecimal.valueOf(0.7)),
+        UNKNOWN("", BigDecimal.ONE)
         ;
 
         private final String code;
