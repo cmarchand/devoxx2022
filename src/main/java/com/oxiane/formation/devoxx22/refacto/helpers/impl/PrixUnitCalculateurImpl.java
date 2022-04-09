@@ -81,4 +81,7 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
             return vistamboire.getPrixUnitaireHT().multiply(coefMultiplicateur);
         }
     }
+
+    private enum RemiseSecteurGeo {
+    }
 }
