@@ -47,9 +47,18 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
     }
 
     private enum ClientType {
-        PARTICULIER(Client.TYPE_PARTICULIER, BigDecimal.ONE, remiseCalculator),
-        PROFESSIONNEL(Client.TYPE_PROFESSIONNEL, BigDecimal.valueOf(0.7), remiseCalculator),
-        UNKNOWN("", BigDecimal.ONE, remiseCalculator)
+        PARTICULIER(
+                Client.TYPE_PARTICULIER,
+                BigDecimal.ONE,
+                (secteurGeographique, qte) -> BigDecimal.ZERO),
+        PROFESSIONNEL(
+                Client.TYPE_PROFESSIONNEL,
+                BigDecimal.valueOf(0.7),
+                (secteurGeographique, qte) -> RemiseSecteurGeo.of(secteurGeographique).calculateRemise(qte)),
+        UNKNOWN(
+                "",
+                BigDecimal.ONE,
+                (secteurGeographique, qte) -> BigDecimal.ZERO)
         ;
 
         private final String code;
