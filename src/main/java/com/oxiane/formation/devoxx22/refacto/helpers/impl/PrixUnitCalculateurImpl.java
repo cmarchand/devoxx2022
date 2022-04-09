@@ -23,14 +23,6 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
             Client client) {
         // étape 1 : en fonction du type de client
         BigDecimal prixUnitaireTypeClient = ClientType.of(client).calculatePrixUnit(vistamboire);
-        if (Client.TYPE_PARTICULIER.equals(client.getType())) {
-            prixUnitaireTypeClient = vistamboire.getPrixUnitaireHT();
-        } else if (Client.TYPE_PROFESSIONNEL.equals(client.getType())) {
-            prixUnitaireTypeClient = vistamboire.getPrixUnitaireHT().multiply(new BigDecimal(0.7));
-        } else {
-            LOGGER.warn("Type de client inconnu : {}", client.getType());
-            prixUnitaireTypeClient = vistamboire.getPrixUnitaireHT();
-        }
         // étape 2 : en fonction du secteur géographique
         SecteurGeographique secteurGeographique = databaseValuesExtractor.getSecteurGeographiqueByDepartement(client.getAdresse().getDepartement());
         if(secteurGeographique==null) {
