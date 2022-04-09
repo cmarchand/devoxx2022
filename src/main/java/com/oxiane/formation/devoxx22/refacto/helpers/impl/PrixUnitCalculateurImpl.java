@@ -84,7 +84,7 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
             return Arrays.stream(values())
                     .filter(clientType -> clientType.code.equals(client.getType()))
                     .findFirst()
-                    .orElseThrow();
+                    .orElse(UNKNOWN);
         }
 
         public BigDecimal calculatePrixUnit(Vistamboire vistamboire) {
