@@ -127,7 +127,8 @@ public class PrixUnitCalculateurTest {
     @Test
     public void given_particulier_qte1_qteachetee10_discount_is_0() {
         // Given
-        Client client = new Client("Nom", "Prenom", Client.TYPE_PARTICULIER, null);
+        Adresse adresse = new Adresse(null, "11 rue A. A. Huet",null, "76600", "Le Havre", "FRANCE");
+        Client client = new Client("Nom", "Prenom", Client.TYPE_PARTICULIER, adresse);
         int qteDejaAchetee = 10;
         int qte = 1;
         BigDecimal expected = BigDecimal.ZERO;
