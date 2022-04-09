@@ -64,4 +64,7 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
             return remise;
         }
     }
+
+    private enum ClientType {
+    }
 }
