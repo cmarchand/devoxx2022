@@ -70,9 +70,11 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
         ;
 
         private final String code;
+        private final BigDecimal coefMultiplicateur;
 
-        ClientType(String code) {
+        ClientType(String code, BigDecimal coefMultiplicateur) {
             this.code = code;
+            this.coefMultiplicateur = coefMultiplicateur;
         }
 
         public static ClientType of(Client client) {
