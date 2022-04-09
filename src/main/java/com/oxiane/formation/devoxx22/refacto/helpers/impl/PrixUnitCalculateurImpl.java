@@ -84,7 +84,7 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
 
     private enum RemiseSecteurGeo {
         ;
-
+        record Seuil(int qte, BigDecimal remise) {};
         private final String nom;
 
         RemiseSecteurGeo(String nom) {
