@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
     private static final Logger LOGGER = LoggerFactory.getLogger(PrixUnitCalculateurImpl.class);
@@ -66,5 +67,13 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
     }
 
     private enum ClientType {
+        ;
+
+        public static ClientType of(Client client) {
+            return Arrays.stream(values())
+                    .filter(clientType -> clientType.code.equals(client.getType()))
+                    .findFirst()
+                    .orElseThrow();
+        }
     }
 }
