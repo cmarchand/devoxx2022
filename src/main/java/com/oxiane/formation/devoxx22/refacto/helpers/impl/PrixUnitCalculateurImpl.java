@@ -102,7 +102,11 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
         }
 
         public BigDecimal calculateRemise(int qteFinale) {
-            return null;
+            return seuils.stream()
+                    .filter(seuil -> qteFinale > seuil.qte())
+                    .map(seuil -> seuil.remise())
+                    .findFirst()
+                    .orElse(BigDecimal.ZERO);
         }
     }
 }
