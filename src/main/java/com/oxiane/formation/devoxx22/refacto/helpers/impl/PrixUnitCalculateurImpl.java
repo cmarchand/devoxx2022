@@ -122,7 +122,7 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
             return Arrays.stream(values())
                     .filter(remiseSecteurGeo -> remiseSecteurGeo.nom.equals(secteurGeographique.getNom()))
                     .findFirst()
-                    .orElseThrow();
+                    .orElse(UNKOWN);
         }
 
         public BigDecimal calculateRemise(int qteFinale) {
