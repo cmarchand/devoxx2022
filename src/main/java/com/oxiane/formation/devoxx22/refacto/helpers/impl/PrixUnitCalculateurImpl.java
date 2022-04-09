@@ -69,6 +69,10 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
         public BigDecimal calculatePrixUnit(Vistamboire vistamboire) {
             return vistamboire.getPrixUnitaireHT().multiply(coefMultiplicateur);
         }
+
+        public BigDecimal calculateRemise(SecteurGeographique secteurGeographique, int qte) {
+            return remiseCalculator.apply(secteurGeographique, qte);
+        }
     }
 
     private enum RemiseSecteurGeo {
