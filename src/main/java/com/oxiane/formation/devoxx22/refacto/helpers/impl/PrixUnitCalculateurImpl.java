@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
 
 public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
     private static final Logger LOGGER = LoggerFactory.getLogger(PrixUnitCalculateurImpl.class);
@@ -46,17 +47,19 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
     }
 
     private enum ClientType {
-        PARTICULIER(Client.TYPE_PARTICULIER, BigDecimal.ONE),
-        PROFESSIONNEL(Client.TYPE_PROFESSIONNEL, BigDecimal.valueOf(0.7)),
-        UNKNOWN("", BigDecimal.ONE)
+        PARTICULIER(Client.TYPE_PARTICULIER, BigDecimal.ONE, remiseCalculator),
+        PROFESSIONNEL(Client.TYPE_PROFESSIONNEL, BigDecimal.valueOf(0.7), remiseCalculator),
+        UNKNOWN("", BigDecimal.ONE, remiseCalculator)
         ;
 
         private final String code;
         private final BigDecimal coefMultiplicateur;
+        private final BiFunction<SecteurGeographique, Integer, BigDecimal> remiseCalculator;
 
-        ClientType(String code, BigDecimal coefMultiplicateur) {
+        ClientType(String code, BigDecimal coefMultiplicateur, BiFunction<SecteurGeographique, Integer, BigDecimal> remiseCalculator) {
             this.code = code;
             this.coefMultiplicateur = coefMultiplicateur;
+            this.remiseCalculator = remiseCalculator;
         }
 
         public static ClientType of(Client client) {
