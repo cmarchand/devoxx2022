@@ -84,6 +84,13 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
     }
 
     private enum RemiseSecteurGeo {
+        AUTRE(
+                SecteurGeographique.NOM_AUTRE,
+                Arrays.asList(
+                        new Seuil(50, BigDecimal.valueOf(0.2)),
+                        new Seuil(20, BigDecimal.valueOf(0.15)),
+                        new Seuil(10, BigDecimal.valueOf(0.1))
+                ))
         ;
         record Seuil(int qte, BigDecimal remise) {};
         private final String nom;
