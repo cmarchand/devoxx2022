@@ -40,20 +40,7 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
             return BigDecimal.ZERO;
         } else {
             SecteurGeographique secteurGeographique = databaseValuesExtractor.getSecteurGeographiqueByDepartement(client.getAdresse().getDepartement());
-            int qteFinale = qteDejaAchetee + quantite;
-            BigDecimal remise = RemiseSecteurGeo.of(secteurGeographique).calculateRemise(qteFinale);
-            if(secteurGeographique==null || SecteurGeographique.NOM_AUTRE.equals(secteurGeographique.getNom())) {
-                if (qteFinale > 50) remise = BigDecimal.valueOf(0.2);
-                else if (qteFinale > 20) remise = BigDecimal.valueOf(0.15);
-                else if (qteFinale > 10) remise = BigDecimal.valueOf(0.1);
-                else remise = BigDecimal.ZERO;
-            } else {
-                if (qteFinale > 40) remise = BigDecimal.valueOf(0.2);
-                else if (qteFinale > 25) remise = BigDecimal.valueOf(0.17);
-                else if (qteFinale > 15) remise = BigDecimal.valueOf(0.1);
-                else remise = BigDecimal.ZERO;
-            }
-            return remise;
+            return RemiseSecteurGeo.of(secteurGeographique).calculateRemise(qteDejaAchetee + quantite);
         }
     }
 
