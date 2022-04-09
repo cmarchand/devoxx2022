@@ -22,7 +22,7 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
             Vistamboire vistamboire,
             Client client) {
         // étape 1 : en fonction du type de client
-        BigDecimal prixUnitaireTypeClient = ClientType.of(client).calculatePrixUnit();
+        BigDecimal prixUnitaireTypeClient = ClientType.of(client).calculatePrixUnit(vistamboire);
         if (Client.TYPE_PARTICULIER.equals(client.getType())) {
             prixUnitaireTypeClient = vistamboire.getPrixUnitaireHT();
         } else if (Client.TYPE_PROFESSIONNEL.equals(client.getType())) {
@@ -80,6 +80,10 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
                     .filter(clientType -> clientType.code.equals(client.getType()))
                     .findFirst()
                     .orElseThrow();
+        }
+
+        public BigDecimal calculatePrixUnit(Vistamboire vistamboire) {
+            return vistamboire.getPrixUnitaireHT().multiply(coefMultiplicateur);
         }
     }
 }
