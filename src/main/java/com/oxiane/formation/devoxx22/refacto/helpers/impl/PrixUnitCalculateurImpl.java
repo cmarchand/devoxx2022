@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
 
 public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
     private static final Logger LOGGER = LoggerFactory.getLogger(PrixUnitCalculateurImpl.class);
@@ -86,9 +87,11 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
         ;
         record Seuil(int qte, BigDecimal remise) {};
         private final String nom;
+        private final List<Seuil> seuils;
 
-        RemiseSecteurGeo(String nom) {
+        RemiseSecteurGeo(String nom, List<Seuil> seuils) {
             this.nom = nom;
+            this.seuils = seuils;
         }
 
         public static RemiseSecteurGeo of(SecteurGeographique secteurGeographique) {
