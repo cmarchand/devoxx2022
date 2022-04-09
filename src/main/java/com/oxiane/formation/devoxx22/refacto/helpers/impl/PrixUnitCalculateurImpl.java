@@ -85,6 +85,12 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
     private enum RemiseSecteurGeo {
         ;
 
+        private final String nom;
+
+        RemiseSecteurGeo(String nom) {
+            this.nom = nom;
+        }
+
         public static RemiseSecteurGeo of(SecteurGeographique secteurGeographique) {
             return Arrays.stream(values())
                     .filter(remiseSecteurGeo -> remiseSecteurGeo.nom.equals(secteurGeographique.getNom()))
