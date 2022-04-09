@@ -97,5 +97,9 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
                     .findFirst()
                     .orElseThrow();
         }
+
+        public BigDecimal calculateRemise(int qteFinale) {
+            return null;
+        }
     }
 }
