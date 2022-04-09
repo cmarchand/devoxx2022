@@ -21,9 +21,7 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
     public BigDecimal calculatePrixUnit(
             Vistamboire vistamboire,
             Client client) {
-        // étape 1 : en fonction du type de client
         BigDecimal prixUnitaireTypeClient = ClientType.of(client).calculatePrixUnit(vistamboire);
-        // étape 2 : en fonction du secteur géographique
         SecteurGeographique secteurGeographique = databaseValuesExtractor.getSecteurGeographiqueByDepartement(client.getAdresse().getDepartement());
         if(secteurGeographique==null) {
             return prixUnitaireTypeClient;
