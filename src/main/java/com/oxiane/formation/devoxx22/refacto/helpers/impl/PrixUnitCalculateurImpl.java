@@ -69,6 +69,12 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
     private enum ClientType {
         ;
 
+        private final String code;
+
+        ClientType(String code) {
+            this.code = code;
+        }
+
         public static ClientType of(Client client) {
             return Arrays.stream(values())
                     .filter(clientType -> clientType.code.equals(client.getType()))
