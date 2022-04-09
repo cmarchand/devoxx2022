@@ -39,11 +39,6 @@ public class PrixUnitCalculateurImpl implements PrixUnitCalculateur {
             int quantite) {
         SecteurGeographique secteurGeographique = databaseValuesExtractor.getSecteurGeographiqueByDepartement(client.getAdresse().getDepartement());
         return ClientType.of(client).calculateRemise(secteurGeographique, qteDejaAchetee+quantite);
-        if(Client.TYPE_PARTICULIER.equals(client.getType())) {
-            return BigDecimal.ZERO;
-        } else {
-            return RemiseSecteurGeo.of(secteurGeographique).calculateRemise(qteDejaAchetee + quantite);
-        }
     }
 
     private enum ClientType {
